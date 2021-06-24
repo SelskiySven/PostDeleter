@@ -4,7 +4,6 @@ setTimeout(() => {
 }, 100);
 
 let deletedposts = 0
-let postisdel = []
 let onsite = true
 let deletedpostersarray = []
 let FeedWrap = document.querySelectorAll(".feed-wrap")[1]
@@ -24,11 +23,8 @@ function deleteposts() {
         let id = localStorage.getItem("delpost" + i)
         deletedpostersarray[i] = id
         try {
-            document.getElementById(id).parentNode.remove()
-            postisdel[i] = true
+            document.getElementById(id).parentNode.style.display = "none"
         } catch {
-            if (postisdel[i] != true)
-                postisdel[i] = false
         }
     }
 }
@@ -73,8 +69,7 @@ function createdeleter() {
             deletedposts = deletedposts + 1
             localStorage.removeItem("DeletedPosts")
             localStorage.setItem("DeletedPosts", deletedposts)
-            deleter.parentNode.parentNode.remove()
-            postisdel.push(true)
+            deleter.parentNode.parentNode.style.display = "none"
             deleteposts()
             dropdowncreate()
             checknumitems()
@@ -130,20 +125,6 @@ function dropdowncreate() {
     DropDownTable = document.createElement("table")
     DropDownTable.id = "DeletedPostTable"
     DropDownMenu.append(DropDownTable)
-    let alertt = document.createElement("p")
-    alertt.innerHTML = "Обновления вступят в силу после перезагрузки страницы"
-    alertt.style.color = "red"
-    alertt.id = "PostDeleterAlert"
-    alertt.style.display = "none"
-    DropDownMenu.insertBefore(alertt, DropDownMenu.firstChild)
-    let reloadbutton = document.createElement("button")
-    reloadbutton.id = "DelPostBut"
-    reloadbutton.style.display = "none"
-    reloadbutton.innerHTML = "Перезагрузить"
-    reloadbutton.onclick = function () {
-        location.reload()
-    }
-    DropDownMenu.insertBefore(reloadbutton, DropDownMenu.firstChild)
 
     for (let i = deletedpostersarray.length - 1; i >= 0; i--) {
         let ddt = document.getElementById("DeletedPostTable")
@@ -161,10 +142,8 @@ function dropdowncreate() {
         butt = document.createElement("button")
         butt.innerHTML = "Вернуть"
         butt.onclick = function () {
-            if (postisdel[i]) {
-                document.getElementById("PostDeleterAlert").style.display = "block"
-                document.getElementById("DelPostBut").style.display = "block"
-            }
+            console.log(deletedpostersarray[i])
+            document.getElementById(deletedpostersarray[i]).parentNode.style.display = "block"
             deletedpostersarray.splice(i, 1)
             for (let j = 0; j < deletedpostersarray.length; j++) {
                 localStorage.removeItem("delpost" + j)

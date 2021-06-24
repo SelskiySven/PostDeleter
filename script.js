@@ -142,7 +142,6 @@ function dropdowncreate() {
         butt = document.createElement("button")
         butt.innerHTML = "Вернуть"
         butt.onclick = function () {
-            console.log(deletedpostersarray[i])
             document.getElementById(deletedpostersarray[i]).parentNode.style.display = "block"
             deletedpostersarray.splice(i, 1)
             for (let j = 0; j < deletedpostersarray.length; j++) {

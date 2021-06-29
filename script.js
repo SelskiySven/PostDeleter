@@ -1,10 +1,18 @@
-window.scroll(0,document.body.scrollHeight)
-setTimeout(() => {
-    window.scroll(0,0)
-}, 100);
+document.body.onload = function () {
+    setTimeout(() => {
+        window.scroll(0, document.body.scrollHeight)
+    }, 100);
+}
+let startinterval = setInterval(start, 100)
+function start() {
+    if (document.getElementById("sonet_log_more_container_first").firstChild.style.display == "block") {
+        window.scroll(0, 0)
+        clearInterval(startinterval)
+    }
+}
 
 let deletedposts = 0
-let onsite = true
+let numischecked = false
 let deletedpostersarray = []
 let FeedWrap = document.querySelectorAll(".feed-wrap")[1]
 let PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0]
@@ -22,6 +30,16 @@ function deleteposts() {
     for (let i = 0; i < deletedposts; i++) {
         let id = localStorage.getItem("delpost" + i)
         deletedpostersarray[i] = id
+        let postarray1 = document.querySelectorAll(".feed-item-wrap")
+        postarray1 = Array.prototype.slice.call(postarray1)
+        for (let i = postarray1.length - 1; i >= 0; i--) {
+            if (postarray1[i].style.display == "none") {
+                postarray1.splice(i, 1)
+            }
+        }
+        if (postarray1.length < 5) {
+            addmoreposts(true)
+        }
         try {
             document.getElementById(id).parentNode.style.display = "none"
         } catch {
@@ -33,13 +51,13 @@ deleteposts()
 //Создание крестиков
 let postarray = document.querySelectorAll(".feed-item-wrap")
 function createdeleter() {
-    for (let i=0;i<postarray.length;i++){
+    for (let i = 0; i < postarray.length; i++) {
         postarray[i].style.background = "white"
     }
     let kr = document.querySelectorAll(".PostDeleter")
-        for (let i = 0; i < kr.length; i++) {
-            kr[i].remove()
-        }
+    for (let i = 0; i < kr.length; i++) {
+        kr[i].remove()
+    }
     postarray = document.querySelectorAll(".feed-item-wrap")
     for (let i = 0; i < postarray.length; i++) {
         let deleterdiv = document.createElement("div")
@@ -70,9 +88,21 @@ function createdeleter() {
             localStorage.removeItem("DeletedPosts")
             localStorage.setItem("DeletedPosts", deletedposts)
             deleter.parentNode.parentNode.style.display = "none"
-            deleteposts()
+            let postarray1 = document.querySelectorAll(".feed-item-wrap")
+            postarray1 = Array.prototype.slice.call(postarray1)
+            for (let i = postarray1.length - 1; i >= 0; i--) {
+                if (postarray1[i].style.display == "none") {
+                    postarray1.splice(i, 1)
+                }
+            }
+            if (postarray1.length < 5) {
+                addmoreposts()
+            }
+            //deleteposts()
             dropdowncreate()
+            if(!numischecked){
             checknumitems()
+            }
         }
         postarray[i].insertBefore(deleterdiv, postarray[i].firstChild)
         document.getElementById("PostDeleter" + i).append(deleter)
@@ -81,10 +111,10 @@ function createdeleter() {
 
 //Создание выпадающего меню с удаленными постами
 function dropdowncreate() {
-    try{
+    try {
         document.getElementById("dropmenu").remove()
         document.getElementById("delpstbut").remove()
-    } catch{
+    } catch {
 
     }
     let m = document.createElement("button")
@@ -162,22 +192,25 @@ function dropdowncreate() {
 //Проверка для загрузки дополнительных постов
 function checknumitems() {
     let numpost = 0
-    for (let i=0;i<FeedWrap.childNodes.length;i++){
-        if (FeedWrap.childNodes[i].className == "feed-item-wrap"){
-            numpost++
+    for (let i = 0; i < FeedWrap.childNodes.length; i++) {
+        if (FeedWrap.childNodes[i].className == "feed-item-wrap") {
+            if (FeedWrap.childNodes[i].style.display != "none") {
+                numpost++
+            }
         }
     }
-    if (numpost<5){
+    if (numpost < 5) {
         clearInterval(update)
         document.getElementById("sonet_log_more_container_first").click()
         deleteposts()
         createdeleter()
+        numischecked = true
     }
 }
 
 //Стартовая функция загрузки постов
-function startcheckitems(){
-    if (document.getElementById("sonet_log_more_container_first").firstChild.style.display == "block"){
+function startcheckitems() {
+    if (document.getElementById("sonet_log_more_container_first").firstChild.style.display == "block") {
         document.getElementById("sonet_log_more_container_first").click()
         clearInterval(update)
         createdeleter()
@@ -185,30 +218,56 @@ function startcheckitems(){
 }
 
 
-function postupdate(goy){
+function postupdate(goy) {
     deleteposts()
     createdeleter()
     dropdowncreate()
     let postarray1 = document.querySelectorAll(".feed-item-wrap")
-    for (let i=0;i<postarray1.length;i++){
+    for (let i = 0; i < postarray1.length; i++) {
         postarray1[i].style.background = "white"
     }
-    if(goy){
+    postarray1 = Array.prototype.slice.call(postarray1)
+    for (let i = postarray1.length - 1; i >= 0; i--) {
+        if (postarray1[i].style.display == "none") {
+            postarray1.splice(i, 1)
+        }
+    }
+    if (goy) {
         let h = pageYOffset
         window.scroll(0, document.body.scrollHeight)
         setTimeout(() => {
             window.scroll(0, h)
         }, 100);
-        document.getElementById("sonet_log_more_container_first").click()
+        if (postarray1.length < 5) {
+            document.getElementById("sonet_log_more_container_first").click()
+        }
     }
 
+}
+
+function addmoreposts(start=false) {
+    let h = pageYOffset
+    if(start){
+        h=0
+    }
+    window.scroll(0, document.body.scrollHeight)
+    setTimeout(() => {
+        window.scroll(0, h)
+    }, 100);
 }
 
 dropdowncreate()
 createdeleter()
 let update
-if (postarray.length<5){
-    update = setInterval(startcheckitems,100)
+let postarray2 = document.querySelectorAll(".feed-item-wrap")
+postarray2 = Array.prototype.slice.call(postarray2)
+for (let i = postarray2.length - 1; i >= 0; i--) {
+    if (postarray2[i].style.display == "none") {
+        postarray2.splice(i, 1)
+    }
+}
+if (postarray2.length < 5) {
+    update = setInterval(startcheckitems, 100)
 }
 
 const observerpostcontainer = new MutationObserver(multifunc)
@@ -217,18 +276,18 @@ observerpostcontainer.observe(document.getElementById("log_internal_container"),
 })
 
 
-function multifunc(){
+function multifunc() {
     setTimeout(() => {
         postupdate(false)
     }, 100);
 }
-function multifunc2(){
+function multifunc2() {
     setTimeout(() => {
         postupdate(true)
     }, 100);
 }
 
 const observernewpost = new MutationObserver(multifunc2)
-observernewpost.observe(FeedWrap,config = {
+observernewpost.observe(FeedWrap, config = {
     childList: true
 })

@@ -3,6 +3,7 @@ document.body.onload = function () {
         window.scroll(0, document.body.scrollHeight)
     }, 100);
 }
+window.scroll(0, document.body.scrollHeight)
 let startinterval = setInterval(start, 100)
 function start() {
     if (document.getElementById("sonet_log_more_container_first").firstChild.style.display == "block") {

@@ -1,17 +1,14 @@
-document.body.onload = function () {
-    setTimeout(() => {
+let starts = setInterval(start,100)
+
+function start(){
+    if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first"){
         window.scroll(0, document.body.scrollHeight)
-    }, 100);
-}
-window.scroll(0, document.body.scrollHeight)
-let startinterval = setInterval(start, 100)
-function start() {
-    if (document.getElementById("sonet_log_more_container_first").firstChild.style.display == "block") {
-        window.scroll(0, 0)
-        clearInterval(startinterval)
+    }
+    if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible"){
+        window.scroll(0,0)
+        clearInterval(starts)
     }
 }
-
 let deletedposts = 0
 let numischecked = false
 let deletedpostersarray = []

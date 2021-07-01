@@ -1,12 +1,26 @@
-let starts = setInterval(start,100)
+let starts = setInterval(start, 100)
+let startisrunning = true
 
-function start(){
-    if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first"){
-        window.scroll(0, document.body.scrollHeight)
-    }
-    if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible"){
-        window.scroll(0,0)
+function start() {
+    if (document.getElementById("feed-new-message-inf-wrap-first") != null) {
+        if (document.getElementById("feed-new-message-inf-wrap-first").style.display == "none") {
+            clearInterval(starts)
+            startisrunning = false
+            document.body.background="white"
+        } else {
+            document.body.background = "red"
+            if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first") {
+                window.scroll(0, document.body.scrollHeight)
+            }
+            if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible") {
+                window.scroll(0, 0)
+                clearInterval(starts)
+                startisrunning = false
+            }
+        }
+    } else {
         clearInterval(starts)
+        startisrunning = false
     }
 }
 let deletedposts = 0
@@ -96,10 +110,9 @@ function createdeleter() {
             if (postarray1.length < 5) {
                 addmoreposts()
             }
-            //deleteposts()
             dropdowncreate()
-            if(!numischecked){
-            checknumitems()
+            if (!numischecked) {
+                checknumitems()
             }
         }
         postarray[i].insertBefore(deleterdiv, postarray[i].firstChild)
@@ -240,13 +253,12 @@ function postupdate(goy) {
             document.getElementById("sonet_log_more_container_first").click()
         }
     }
-
 }
 
-function addmoreposts(start=false) {
+function addmoreposts(start = false) {
     let h = pageYOffset
-    if(start){
-        h=0
+    if (start) {
+        h = 0
     }
     window.scroll(0, document.body.scrollHeight)
     setTimeout(() => {
@@ -275,9 +287,14 @@ observerpostcontainer.observe(document.getElementById("log_internal_container"),
 
 
 function multifunc() {
+    if (!startisrunning) {
+        starts = setInterval(start, 100)
+        startisrunning = true
+    }
     setTimeout(() => {
         postupdate(false)
     }, 100);
+    checknumitems()
 }
 function multifunc2() {
     setTimeout(() => {

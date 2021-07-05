@@ -12,7 +12,9 @@
           "js": ["script.js"]
         }
     ],
-    "default_icon": "icons/icon128.png",
+    "browser_action": {
+      "default_icon": "icons/icon128.png"
+      },
     "icons": {
         "128": "icons/icon128.png",
         "16": "icons/icon16.png",

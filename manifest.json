@@ -1,21 +1,18 @@
 {
     "name": "PostDeleter",
     "description" : "Post Deleter for portal.unn.ru",
-    "autor" : "Mark",
-    "version": "2.2",
+    "version": "2.3",
     "developer": {
       "name": "MarkSven"
    },
     "manifest_version": 2,
-    "browser_action": {
-    "default_icon": "icons/icon.png"
-    },
     "content_scripts": [
         {
           "matches": ["https://portal.unn.ru/stream/*"],
           "js": ["script.js"]
         }
     ],
+    "default_icon": "icons/icon128.png",
     "icons": {
         "128": "icons/icon128.png",
         "16": "icons/icon16.png",

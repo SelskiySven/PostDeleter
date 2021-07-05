@@ -6,9 +6,7 @@ function start() {
         if (document.getElementById("feed-new-message-inf-wrap-first").style.display == "none") {
             clearInterval(starts)
             startisrunning = false
-            document.body.background="white"
         } else {
-            document.body.background = "red"
             if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first") {
                 window.scroll(0, document.body.scrollHeight)
             }
@@ -110,6 +108,8 @@ function createdeleter() {
             if (postarray1.length < 5) {
                 addmoreposts()
             }
+            deletedpostersarray.push(this.parentNode.nextSibling.id)
+            console.log(deletedpostersarray)
             dropdowncreate()
             if (!numischecked) {
                 checknumitems()

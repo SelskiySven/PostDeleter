@@ -52,7 +52,7 @@ function deleteposts() {
         }
         try {
             document.getElementById(id).parentNode.style.display = "none"
-        } catch {
+        } catch(error) {
         }
     }
 }
@@ -109,7 +109,6 @@ function createdeleter() {
                 addmoreposts()
             }
             deletedpostersarray.push(this.parentNode.nextSibling.id)
-            console.log(deletedpostersarray)
             dropdowncreate()
             if (!numischecked) {
                 checknumitems()
@@ -125,7 +124,7 @@ function dropdowncreate() {
     try {
         document.getElementById("dropmenu").remove()
         document.getElementById("delpstbut").remove()
-    } catch {
+    } catch(error) {
 
     }
     let m = document.createElement("button")

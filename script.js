@@ -123,7 +123,7 @@ function createdeleter() {
 function dropdowncreate() {
     try {
         document.getElementById("dropmenu").remove()
-        document.getElementById("delpstbut").remove()
+        document.getElementById("deletedpostbutton").remove()
     } catch(error) {
 
     }
@@ -133,7 +133,8 @@ function dropdowncreate() {
     m.style.border = "none"
     m.style.cursor = "pointer"
     m.style.fontSize = "14pt"
-    m.id = "delpstbut"
+    m.style.margin = "1% 0"
+    m.id = "deletedpostbutton"
     m.addEventListener('mouseenter', function () {
         m.style.background = "#2980B9"
     })
@@ -169,19 +170,19 @@ function dropdowncreate() {
     for (let i = deletedpostersarray.length - 1; i >= 0; i--) {
         let ddt = document.getElementById("DeletedPostTable")
         let DropDownItems = document.createElement("tr")
-        DropDownItems.id = "dp" + i
+        DropDownItems.id = "DeletedPostRow" + i
         ddt.append(DropDownItems)
-        let DropDownItem = document.getElementById("dp" + i)
-        let butth = document.createElement("th")
-        butth.id = "butth" + i
+        let DropDownItem = document.getElementById("DeletedPostRow" + i)
+        let DeletedPostName = document.createElement("th")
+        DeletedPostName.id = "DeletedPostName" + i
         let pid = document.createElement("th")
         pid.innerHTML = deletedpostersarray[i]
-        pid.id = "butt" + i
+        pid.id = "DeletedPostButton" + i
         DropDownItem.append(pid)
-        DropDownItem.append(butth)
-        butt = document.createElement("button")
-        butt.innerHTML = "Вернуть"
-        butt.onclick = function () {
+        DropDownItem.append(DeletedPostName)
+        DeletedPostButton = document.createElement("button")
+        DeletedPostButton.innerHTML = "Вернуть"
+        DeletedPostButton.onclick = function () {
             document.getElementById(deletedpostersarray[i]).parentNode.style.display = "block"
             deletedpostersarray.splice(i, 1)
             for (let j = 0; j < deletedpostersarray.length; j++) {
@@ -194,7 +195,7 @@ function dropdowncreate() {
             deletedposts = deletedposts - 1
             localStorage.setItem("DeletedPosts", deletedposts)
         }
-        document.getElementById("butth" + i).append(butt)
+        document.getElementById("DeletedPostName" + i).append(DeletedPostButton)
     }
 
 }
@@ -244,9 +245,10 @@ function postupdate(goy) {
     }
     if (goy) {
         let h = pageYOffset
-        window.scroll(0, document.body.scrollHeight)
+        let w = pageXOffset
+        window.scroll(w, document.body.scrollHeight)
         setTimeout(() => {
-            window.scroll(0, h)
+            window.scroll(w, h)
         }, 100);
         if (postarray1.length < 5) {
             document.getElementById("sonet_log_more_container_first").click()
@@ -256,12 +258,14 @@ function postupdate(goy) {
 
 function addmoreposts(start = false) {
     let h = pageYOffset
+    let w = pageXOffset
     if (start) {
         h = 0
+        w = 0
     }
-    window.scroll(0, document.body.scrollHeight)
+    window.scroll(w, document.body.scrollHeight)
     setTimeout(() => {
-        window.scroll(0, h)
+        window.scroll(w, h)
     }, 100);
 }
 

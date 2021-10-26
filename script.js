@@ -9,8 +9,12 @@ function Load_new_posts_button() {
             if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first") {    //Иначе спускаемся в самый низ для активации скрипта сайта для загрузки этой кнопки
                 window.scroll(0, document.body.scrollHeight)
             }
-            if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible") {    //Кнопка подгрузилась значит возвращаемся в начало страницы и завершаем данную функкцию
+            if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible") {    //Кнопка подгрузилась значит возвращаемся в начало страницы и завершаем данную функцию
                 window.scroll(0, 0)
+                try {
+                    clearInterval(starts)
+                } catch (error) {
+                }
             }
         }
     } else {    //Если кнопки "Ещё события" нет, то и делать ничего не надо(дело в том, что в адресной строке может быть https://portal.unn.ru/stream/ , но мы по факту будем находится на странице авторизации)

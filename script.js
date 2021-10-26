@@ -116,6 +116,7 @@ function Create_dropdown_menu() {
 
     let Deleted_posts_menu = document.createElement("div")    //Страница с меню
     Deleted_posts_menu.id = "DropMenuDeletedPosts"
+    Deleted_posts_menu.style.display = "none"
     PagetitleWrap.append(Deleted_posts_menu)
     let Deleted_posts_table = document.createElement("table")
     Deleted_posts_table.id = "DeletedPostsTable"
@@ -211,6 +212,6 @@ function Сontainer_has_been_added() {    //Мультифункция на сл
     setTimeout(() => {
         Delete_posts()
         Create_deleter()
-        Load_new_posts_button() //На случай, если выходим из поиска
+        starts = setInterval(Load_new_posts_button, 100) //На случай, если выходим из поиска
     }, 10);
 }

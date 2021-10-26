@@ -1,14 +1,6 @@
 let starts = setInterval(Load_new_posts_button, 100)
 
-// function Customize_posts() {    //просто кастомизирует таблички для красоты
-//     let Posts_array = document.querySelectorAll(".feed-item-wrap")
-//     for (let i = 0; i < Posts_array.length; i++) {
-//          
-//     }
-// }
-// Customize_posts()
-
-//Стартовая функция для загрузки кнопки "Ещё события", для того чтобы нажать на нее в случае необходимости
+//Функция для загрузки кнопки "Ещё события", для того чтобы нажать на нее в случае необходимости
 function Load_new_posts_button() {
     if (document.getElementById("feed-new-message-inf-wrap-first") != null) {   //Выполняем только если есть кнопка "Ещё события"
         if (document.getElementById("feed-new-message-inf-wrap-first").style.display == "none") {   //Значит кнопка уже нажата
@@ -19,11 +11,13 @@ function Load_new_posts_button() {
             }
             if (document.getElementById("feed-new-message-inf-wrap-first").className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible") {    //Кнопка подгрузилась значит возвращаемся в начало страницы и завершаем данную функкцию
                 window.scroll(0, 0)
-                clearInterval(starts)
             }
         }
     } else {    //Если кнопки "Ещё события" нет, то и делать ничего не надо(дело в том, что в адресной строке может быть https://portal.unn.ru/stream/ , но мы по факту будем находится на странице авторизации)
-        clearInterval(starts)
+        try {
+            clearInterval(starts)
+        } catch (error) {
+        }
     }
 }
 
@@ -35,6 +29,10 @@ let FeedWrap = document.querySelectorAll(".feed-wrap")[1] //Это основн�
 let PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0] //Это элемент над стеной с постами в нем содержится надмись "Новости", а данный аддон создает в нем меню с удаленными постами
 let Posts_array  //Cписок всех постов
 
+//>>>Константы<<<//
+const Resources = chrome.runtime.getURL("Resources")
+
+const Deleter_button_path = Resources + "/delete.svg"
 
 //Загрузка счетчика из локального хранилища
 if (localStorage.getItem("DeletedPosts") == null) {    //Если в локальном хранилище нет переменной, содержащей количество удаленных постов, значит аддон запущен впервые и её требуется создать
@@ -59,35 +57,17 @@ Delete_posts()
 
 //Создание крестиков
 function Create_deleter() {
-    let Post_deleter = document.querySelectorAll(".PostDeleter")
+    let Post_deleter = document.querySelectorAll(".PostDeleterDiv")
     for (let i = 0; i < Post_deleter.length; i++) {    //Удаляем все крестики
         Post_deleter[i].remove()
     }
     Posts_array = document.querySelectorAll(".feed-item-wrap")  //Получаем список всех постов
     for (let i = 0; i < Posts_array.length; i++) {      // Перебираем все посты
         let Deleter_div = document.createElement("div")  //Создаем контейнер для крестика
-        Deleter_div.style.display = "flex"
-        Deleter_div.style.background = "white"
-        Deleter_div.style.justifyContent = "flex-end"
-        Deleter_div.id = "PostDeleter" + i
-        Deleter_div.className = "PostDeleter"
-        let Deleter = document.createElement("button") //Создаем сам крестик
-        Deleter.className = "test"
-        Deleter.innerHTML = "X"
-        Deleter.style.border = "none"
-        Deleter.style.color = "red"
-        Deleter.style.float = "right"
-        Deleter.style.fontSize = "25pt"
-        Deleter.style.margin = "0 5px"
-        Deleter.style.padding = "0 5px"
-        Deleter.style.background = "white"
-        Deleter.style.cursor = "pointer"
-        Deleter.addEventListener('mouseenter', function () {
-            Deleter.style.background = "pink"
-        })
-        Deleter.addEventListener('mouseleave', function () {
-            Deleter.style.background = "white"
-        })
+        Deleter_div.className = "PostDeleterDiv"
+        let Deleter = document.createElement("button") //Создаем кнопку
+        Deleter.className = "PostDeleter"
+        //Deleter.style.background = `url(${Deleter_button_path})`
         Deleter.onclick = function () {     //Функция нажатия на крестик
             localStorage.setItem("delpost" + Number_of_deleted_posts, Deleter.parentNode.parentNode.children[1].id)    //Добавляем в локальное хранилище id поста
             Number_of_deleted_posts = Number_of_deleted_posts + 1     //Прибаляем к счетчику 1
@@ -98,8 +78,12 @@ function Create_deleter() {
             Create_dropdown_menu()  //Пересоздаем меню со списком удаленных постов
             Check_number_of_visible_posts() //Проверяем количество видимых постов, чтобы не получилась пустая страница
         }
+        let Deleter_image = document.createElement("img")
+        Deleter_image.src = Deleter_button_path
+        Deleter_image.className = "DeleterImage"
         Posts_array[i].insertBefore(Deleter_div, Posts_array[i].firstChild)
-        document.getElementById("PostDeleter" + i).append(Deleter)
+        Deleter_div.append(Deleter)
+        Deleter.append(Deleter_image)
     }
 }
 Create_deleter()
@@ -107,60 +91,39 @@ Create_deleter()
 //Создание выпадающего меню с удаленными постами
 function Create_dropdown_menu() {
     try {   //Пытаемся удалить кнопку открывающую меню и само меню, т.к. иногда нужно пересоздавать меню
-        document.getElementById("DropMenu").remove()
+        document.getElementById("DropMenuDeletedPosts").remove()
         document.getElementById("DeletedPostsMenu").remove()
+        document.getElementById("Indentdiv").remove()
     } catch (error) {
     }
-    let Menu_button = document.createElement("button")    //Кнопка открывающая меню
-    Menu_button.style.background = "#3498DB"
-    Menu_button.innerHTML = "Удаленные посты"
-    Menu_button.style.border = "none"
-    Menu_button.style.cursor = "pointer"
-    Menu_button.style.fontSize = "14pt"
-    Menu_button.style.margin = "1% 0"
-    Menu_button.id = "DeletedPostsMenu"
-    Menu_button.addEventListener('mouseenter', function () {
-        Menu_button.style.background = "#2980B9"
-    })
-    Menu_button.addEventListener('mouseleave', function () {
-        Menu_button.style.background = "#3498DB"
-    })
-    Menu_button.onclick = function () {
-        if (document.getElementById("DropMenu").style.display == "none") {
-            document.getElementById("DropMenu").style.display = "block"
+    let Menu_button_deleted_posts = document.createElement("button")    //Кнопка открывающая меню
+    Menu_button_deleted_posts.innerHTML = "Удаленные посты"
+    Menu_button_deleted_posts.id = "DeletedPostsMenu"
+    Menu_button_deleted_posts.onclick = function () { //Функция открывающая и закрывающая меню
+        if (document.getElementById("DropMenuDeletedPosts").style.display == "none") {
+            document.getElementById("DropMenuDeletedPosts").style.display = "block"
+            Menu_button_deleted_posts.style.borderRadius = "0.7vh 0.7vh 0 0"
         } else {
-            if (document.getElementById("DropMenu").style.display == "block") {
-                document.getElementById("DropMenu").style.display = "none"
-            }
+            document.getElementById("DropMenuDeletedPosts").style.display = "none"
+            Menu_button_deleted_posts.style.borderRadius = ""
         }
     }
-    PagetitleWrap.append(Menu_button)
+    PagetitleWrap.append(Menu_button_deleted_posts)
 
     let Deleted_posts_menu = document.createElement("div")    //Страница с меню
-    Deleted_posts_menu.id = "DropMenu"
-    Deleted_posts_menu.style.display = "none"
-    Deleted_posts_menu.style.position = "absolute"
-    Deleted_posts_menu.style.background = "lightgray"
-    Deleted_posts_menu.style.zIndex = "12"
-    Deleted_posts_menu.style.boxShadow = "0px 8px 16px 0px rgba(0,0,0,0.2)"
-    Deleted_posts_menu.style.maxHeight = window.innerHeight / 2 + "px"
-    Deleted_posts_menu.style.maxWidth = Deleted_posts_menu.style.width + "px"
-    Deleted_posts_menu.style.overflowY = "scroll"
+    Deleted_posts_menu.id = "DropMenuDeletedPosts"
     PagetitleWrap.append(Deleted_posts_menu)
-    Deleted_posts_menu = document.getElementById("DropMenu")
     let Deleted_posts_table = document.createElement("table")
     Deleted_posts_table.id = "DeletedPostsTable"
     Deleted_posts_menu.append(Deleted_posts_table)
-    Deleted_posts_table = document.getElementById("DeletedPostsTable")
 
     for (let i = Deleted_posts_array.length - 1; i >= 0; i--) {     //Строки меню
         let Deleted_posts_row = document.createElement("tr")    //Строка
         Deleted_posts_row.id = "DeletedPostRow" + i
         Deleted_posts_table.append(Deleted_posts_row)
-        Deleted_posts_row = document.getElementById("DeletedPostRow" + i)
         let Deleted_post_name = document.createElement("th")    // id поста
         Deleted_post_name.id = "DeletedPostName" + i
-        Deleted_post_name.style.margin = "0.5% 0"
+        Deleted_post_name.className = "DeletedPostName"
         Deleted_post_name.innerHTML = Deleted_posts_array[i]
         let Deleted_post_button = document.createElement("th")  //Место для кнопки
         Deleted_post_button.id = "DeletedPostButton" + i
@@ -168,7 +131,7 @@ function Create_dropdown_menu() {
         Deleted_posts_row.append(Deleted_post_button)
         Deleted_post_button = document.createElement("button")  //Сама кнопка
         Deleted_post_button.innerHTML = "Вернуть"
-        Deleted_post_button.onclick = function () {
+        Deleted_post_button.onclick = function () { //Функция нажатия на кнопку "Вернуть"
             document.getElementById(Deleted_posts_array[i]).parentNode.style.display = "block"  //Делаем пост снова видимым
             Deleted_posts_array.splice(i, 1)    //Удаляем его из списка удаленных постов
             for (let j = 0; j < Deleted_posts_array.length; j++) {  //Перебираем локальное хранилище удаляя оттуда данный пост, т.к. локальное хранилище поддерживает только данные типа String и мы просто перезаписываем все записи
@@ -184,6 +147,10 @@ function Create_dropdown_menu() {
         document.getElementById("DeletedPostButton" + i).append(Deleted_post_button)
     }
 
+    let Indent_div = document.createElement("div")    //Создание контейнера для отступа кнопки "Удаленные посты" от контейнера с постами
+    Indent_div.id = "Indentdiv"
+    PagetitleWrap.append(Indent_div)
+
 }
 Create_dropdown_menu()
 
@@ -197,22 +164,26 @@ function Check_number_of_visible_posts() {
         }
     }
     if (Visible_posts_array.length < 5) {   //Если отображаемых постов меньше 5, то зарпускаем триггер для загрузки дополнительных постов
-        console.log(Visible_posts_array)
-        Add_more_posts()
+        Add_more_posts(Visible_posts_array.length)
     }
 }
 
 //Функция для загрузки новых постов
 function Add_more_posts() {
-    if (document.getElementById("sonet_log_more_container_first").parentNode.style.display != "none") { //Если есть кнопка "Еще события", то нажимаем на неё
-        document.getElementById("sonet_log_more_container_first").click()
-    } else {    //Если нет, то запускаем триггер для загрузки новых постов(он запускается, когда пользователь опускается вниз страницы)
-        let h = pageYOffset
-        let w = pageXOffset
-        window.scroll(w, document.body.scrollHeight) //Опускаемся в самый низ
-        setTimeout(() => {  //Через 100 милисекунд возвращаемся на предыдущую позицию
-            window.scroll(w, h)
-        }, 100);
+    if (document.getElementById("sonet_log_more_container_first") != null) { //Если кнопка существует (в поиске ее не существует)
+        if (document.getElementById("sonet_log_more_container_first").parentNode.style.display != "none") { //Если есть кнопка "Еще события", то нажимаем на неё
+            document.getElementById("sonet_log_more_container_first").click()
+        } else {    //Если нет, то запускаем триггер для загрузки новых постов(он запускается, когда пользователь опускается вниз страницы)
+            let h = pageYOffset
+            let w = pageXOffset
+            window.scroll(0, 0)
+            setTimeout(() => {
+                window.scroll(w, document.body.scrollHeight) //Опускаемся в самый низ
+                setTimeout(() => {  //Через 100 милисекунд возвращаемся на предыдущую позицию
+                    window.scroll(w, h)
+                }, 100);
+            }, 100);
+        }
     }
 }
 
@@ -221,7 +192,7 @@ Observer_posts.observe(FeedWrap, config = {
     childList: true
 })
 
-function Post_has_been_added(){     //Мультифункция на случай добавления нового поста
+function Post_has_been_added() {     //Мультифункция на случай добавления нового поста
     setTimeout(() => {
         Create_deleter()
     }, 10);
@@ -232,9 +203,10 @@ Observer_containers.observe(document.getElementById("log_internal_container"), c
     childList: true
 })
 
-function Сontainer_has_been_added(){    //Мультифункция на случай загрузки нового контейнера
+function Сontainer_has_been_added() {    //Мультифункция на случай загрузки нового контейнера
     setTimeout(() => {
         Delete_posts()
-        Create_deleter() 
+        Create_deleter()
+        Load_new_posts_button() //На случай, если выходим из поиска
     }, 10);
 }

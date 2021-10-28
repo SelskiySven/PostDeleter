@@ -1,3 +1,4 @@
+/* Выпадающее меню с удаленными постами */
 #DropMenuDeletedPosts{
     position: absolute;
     background-color: lightgray;
@@ -8,12 +9,16 @@
     border-radius: 0  0 0.7vh 0.7vh;
     width: 200px;
     min-height: 25px;
+    scrollbar-color: rgb(80, 163, 190) lightgray;
+    scrollbar-width: thin;
 }
 
+/* Класс для заострения уголков кнопки меню с удаленными постами */
 .WhenDeletedPostMenuOpen{
     border-radius: 0.7vh 0.7vh 0 0 !important;
 }
 
+/* Кнопка для открытия меню с удаленными постами */
 #DeletedPostsMenu{
     background-color: #3498DB;
     border: none;
@@ -27,12 +32,14 @@
     background-color: #2980B9;
 }
 
+/* Контейнер в котором находится крестик */
 .PostDeleterDiv{
     display: flex;
     background-color: white;
     justify-content: flex-end;
 }
 
+/* Контейнер с картинкой крестика */
 .PostDeleter{
     border: none;
     color: red;
@@ -43,28 +50,31 @@
     cursor: pointer;
 }
 
+/* id удаленного поста в выпадающем меню с удаленными постами */
 .DeletedPostName{
     margin: 0.5% 0;
 }
 
+/* Контейнер для отступа кнопки открывающей меню с удаленными постами от самих постов */
 #Indentdiv{
     margin: 1%;
 }
 
+/* Крестик */
 .DeleterImage{
     width: 2.5vw;
     height: 2.5vw;
 }
 
+/* Настройки красивого скроллбара (не работает в firefox) */
 #DropMenuDeletedPosts::-webkit-scrollbar {
     background-color: lightgray;
     width: 10px;
 }
-
 #DropMenuDeletedPosts::-webkit-scrollbar-track{
     border-radius: 10px;
 }
 #DropMenuDeletedPosts::-webkit-scrollbar-thumb {
     border-radius: 10px;
     background: linear-gradient(180deg, #00c6fb, #005bea);
-  }
+}

@@ -52,7 +52,7 @@ function Delete_posts() {
         Deleted_posts_array[i] = localStorage.getItem("delpost" + i)    //Помещаем id удаленных постов из локального хранилища в массив
         Check_number_of_visible_posts()
         try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
-            document.getElementById(Deleted_posts_array[i]).parentNode.style.display = "none"
+            document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
         } catch (error) {
         }
     }
@@ -71,13 +71,12 @@ function Create_deleter() {
         Deleter_div.className = "PostDeleterDiv"
         let Deleter = document.createElement("button") //Создаем кнопку
         Deleter.className = "PostDeleter"
-        //Deleter.style.background = `url(${Deleter_button_path})`
         Deleter.onclick = function () {     //Функция нажатия на крестик
             localStorage.setItem("delpost" + Number_of_deleted_posts, Deleter.parentNode.parentNode.children[1].id)    //Добавляем в локальное хранилище id поста
             Number_of_deleted_posts = Number_of_deleted_posts + 1     //Прибаляем к счетчику 1
             localStorage.removeItem("DeletedPosts")     //Перезаписываем счетчик в локальное хранилище 
             localStorage.setItem("DeletedPosts", Number_of_deleted_posts)
-            Deleter.parentNode.parentNode.style.display = "none"    //Удаляем пост
+            Deleter.parentNode.parentNode.hidden = true    //Удаляем пост
             Deleted_posts_array.push(this.parentNode.nextSibling.id)    //Добавляем в массив с удаленными постами id удаленого поста
             Create_dropdown_menu()  //Пересоздаем меню со списком удаленных постов
             Check_number_of_visible_posts() //Проверяем количество видимых постов, чтобы не получилась пустая страница
@@ -104,19 +103,18 @@ function Create_dropdown_menu() {
     Menu_button_deleted_posts.innerHTML = "Удаленные посты"
     Menu_button_deleted_posts.id = "DeletedPostsMenu"
     Menu_button_deleted_posts.onclick = function () { //Функция открывающая и закрывающая меню
-        if (document.getElementById("DropMenuDeletedPosts").style.display == "none") {
-            document.getElementById("DropMenuDeletedPosts").style.display = "block"
-            Menu_button_deleted_posts.style.borderRadius = "0.7vh 0.7vh 0 0"
+        Menu_button_deleted_posts.classList.toggle("WhenDeletedPostMenuOpen")
+        if (document.getElementById("DropMenuDeletedPosts").hidden == true) {
+            document.getElementById("DropMenuDeletedPosts").hidden = false
         } else {
-            document.getElementById("DropMenuDeletedPosts").style.display = "none"
-            Menu_button_deleted_posts.style.borderRadius = ""
+            document.getElementById("DropMenuDeletedPosts").hidden = true
         }
     }
     PagetitleWrap.append(Menu_button_deleted_posts)
 
     let Deleted_posts_menu = document.createElement("div")    //Страница с меню
     Deleted_posts_menu.id = "DropMenuDeletedPosts"
-    Deleted_posts_menu.style.display = "none"
+    Deleted_posts_menu.hidden = true
     PagetitleWrap.append(Deleted_posts_menu)
     let Deleted_posts_table = document.createElement("table")
     Deleted_posts_table.id = "DeletedPostsTable"
@@ -137,7 +135,10 @@ function Create_dropdown_menu() {
         Deleted_post_button = document.createElement("button")  //Сама кнопка
         Deleted_post_button.innerHTML = "Вернуть"
         Deleted_post_button.onclick = function () { //Функция нажатия на кнопку "Вернуть"
-            document.getElementById(Deleted_posts_array[i]).parentNode.style.display = "block"  //Делаем пост снова видимым
+            try {
+                document.getElementById(Deleted_posts_array[i]).parentNode.hidden = false  //Делаем пост снова видимым
+            } catch (error) {
+            }
             Deleted_posts_array.splice(i, 1)    //Удаляем его из списка удаленных постов
             for (let j = 0; j < Deleted_posts_array.length; j++) {  //Перебираем локальное хранилище удаляя оттуда данный пост, т.к. локальное хранилище поддерживает только данные типа String и мы просто перезаписываем все записи
                 localStorage.removeItem("delpost" + j)

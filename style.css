@@ -1,5 +1,4 @@
 #DropMenuDeletedPosts{
-    display: none;
     position: absolute;
     background-color: lightgray;
     z-index: 12;
@@ -7,7 +6,12 @@
     overflow-y: scroll;
     max-height: 50vh;
     border-radius: 0  0 0.7vh 0.7vh;
-    width: 11vw;
+    width: 200px;
+    min-height: 25px;
+}
+
+.WhenDeletedPostMenuOpen{
+    border-radius: 0.7vh 0.7vh 0 0 !important;
 }
 
 #DeletedPostsMenu{
@@ -16,7 +20,7 @@
     cursor: pointer;
     font-size: 14pt;
     border-radius: 0.7vh;
-    width: 11vw;
+    width: 200px;
 }
 
 #DeletedPostsMenu:hover{
@@ -52,3 +56,15 @@
     height: 2.5vw;
 }
 
+#DropMenuDeletedPosts::-webkit-scrollbar {
+    background-color: lightgray;
+    width: 10px;
+}
+
+#DropMenuDeletedPosts::-webkit-scrollbar-track{
+    border-radius: 10px;
+}
+#DropMenuDeletedPosts::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: linear-gradient(180deg, #00c6fb, #005bea);
+  }

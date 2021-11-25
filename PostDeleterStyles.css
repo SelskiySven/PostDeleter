@@ -1,155 +1,188 @@
-/* Меню с удаленными постами */
-#DropMenuDeletedPosts{
-    position: absolute;
-    background-color: lightgray;
-    z-index: 12;
-    overflow-y: scroll;
-    max-height: 50vh;
-    border-radius: 0  0 0.7vh 0.7vh;
-    width: 200px;
-    min-height: 25px;
-    scrollbar-color: rgb(80, 163, 190) lightgray;
-    scrollbar-width: thin;
-}
+    /* Класс для заострения уголков кнопки меню с удаленными постами */
+    .WhenMenuOpen{
+        border-radius: 10px 10px 0 0 !important;
+    }
 
-/* Основное меню */
-#MainMenu{
-    position: absolute;
-    background-color: lightgray;
-    z-index: 12;
-    width: 200px;
-}
+    /* Контейнер для меню */
+    #DivForMenus{
+        display: flex;
+        flex-direction: row;
+    }
 
-/* Класс для заострения уголков кнопки меню с удаленными постами */
-.WhenMenuOpen{
-    border-radius: 0.7vh 0.7vh 0 0 !important;
-}
+    /* Кнопка для открытия меню с удаленными постами и основного меню*/
+    #DeletedPostsMenu, #MainMenuButton{
+        background-color: #3498DB;
+        border: none;
+        cursor: pointer;
+        font-size: 14pt;
+        border-radius: 10px;
+        width: 200px;
+        margin-right: 5px;
+    }
+    
+    /* Меню с удаленными постами */
+    #DropMenuDeletedPosts{
+        position: absolute;
+        background-color: lightgray;
+        z-index: 12;
+        max-height: 50vh;
+        border-radius: 0  0 10px 10px;
+        width: 200px;
+        min-height: 25px;
+    }
 
-/* Контейнер для меню */
-#DivForMenus{
-    display: flex;
-    flex-direction: row;
-}
+    /* Контейнер в меню с удаленными постами */
+    #DeletedPostsTableDiv{
+        width: 190px;
+        overflow-y: scroll;
+        scrollbar-color: rgb(80, 163, 190) lightgray;
+        scrollbar-width: thin;
+        max-height: 50vh;
+    }
 
-/* Кнопка для открытия меню с удаленными постами и основного меню*/
-#DeletedPostsMenu, #MainMenuButton{
-    background-color: #3498DB;
-    border: none;
-    cursor: pointer;
-    font-size: 14pt;
-    border-radius: 0.7vh;
-    width: 200px;
-    margin-right: 5px;
-}
+    /* Основное меню */
+    #MainMenu{
+        position: absolute;
+        background-color: lightgray;
+        z-index: 12;
+        width: 200px;
+        border-radius: 0 0 10px 10px;
+    }
 
-#DeletedPostsMenu:hover, #MainMenuButton:hover{
-    background-color: #2980B9;
-}
+    #DeletedPostsMenu:hover, #MainMenuButton:hover{
+        background-color: #2980B9;
+    }
 
-/* Функции основного меню */
-.MainMenuItem{
-    transition: background-color .3s;
-    cursor: pointer;
-    display: flex;
-    min-height: 25px;
-    font-size: 12pt;
-    font-weight: 600;
-}
+    /* Функции основного меню */
+    .MainMenuItem{
+        transition: background-color .3s;
+        cursor: pointer;
+        display: flex;
+        min-height: 25px;
+        font-size: 12pt;
+        font-weight: 600;
+    }
 
-.MainMenuItem:hover{
-    transition: background-color .3s;
-    background-color: rgb(231, 231, 231);
-}
+    .MainMenuItem:hover{
+        transition: background-color .3s;
+        background-color: rgb(231, 231, 231);
+    }
 
-/* Текст функций основного меню */
-.MainMenuItem:first-child{
-    justify-content: center;
-    align-items: center;
-}
+    #IndentDiv2{
+        height: 10px;
+    }
 
-/* Меню с очисткой данных */
-#ClearCacheMenu{
-    height: 5vh;
-} 
+    /* Текст функций основного меню */
+    .MainMenuItem:first-child{
+        justify-content: center;
+        align-items: center;
+    }
 
-/* Контейнер с текстом "Очистить данные?" */
-#ClearCacheSure{
-    font-weight: 600;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    /* Меню с очисткой данных */
+    #ClearCacheMenu{
+        height: 50px;
+        transform-origin: top;
+    } 
 
-/* Кнопка отмены удаления данных */
-#ClearCacheNO{
-    margin: 5px;
-    float: right;
-    cursor: pointer;
-    border-width: 0px;
-    border-radius: 5px;
-    background-color: rgb(255, 108, 108);
-    width: 30%;
-}
+    /* Контейнер с текстом "Очистить данные?" */
+    #ClearCacheSure{
+        font-weight: 600;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-/* Кнопка подтверждения очистки данных */
-#ClearCacheYES{
-    margin: 5px;
-    float: left;
-    cursor: pointer;
-    border-width: 0px;
-    border-radius: 5px;
-    background-color: green;
-    width: 30%;
-}
+    /* Кнопка отмены удаления данных */
+    #ClearCacheNO{
+        margin: 5px;
+        float: right;
+        cursor: pointer;
+        border-width: 0px;
+        border-radius: 5px;
+        background-color: rgb(255, 108, 108);
+        width: 30%;
+    }
 
-/* Полоска в главном меню для разделения элементов */
-#Strip{
-    margin: 0;
-}
+    /* Кнопка подтверждения очистки данных */
+    #ClearCacheYES{
+        margin: 5px;
+        float: left;
+        cursor: pointer;
+        border-width: 0px;
+        border-radius: 5px;
+        background-color: green;
+        width: 30%;
+    }
 
-/* Контейнер в котором находится крестик */
-.PostDeleterDiv{
-    display: flex;
-    background-color: white;
-    justify-content: flex-end;
-}
+    /* Полоска в главном меню для разделения элементов */
+    #Strip{
+        margin: 0;
+    }
 
-/* Контейнер с картинкой крестика */
-.PostDeleter{
-    border: none;
-    float: right;
-    margin: 0 5px;
-    padding: 0 5px;
-    background: white;
-    cursor: pointer;
-}
+    /* Контейнер в котором находится крестик */
+    .PostDeleterDiv{
+        display: flex;
+        background-color: white;
+        justify-content: flex-end;
+    }
 
-/* id удаленного поста в выпадающем меню с удаленными постами */
-.DeletedPostName{
-    margin: 0.5% 0;
-}
+    /* Контейнер с картинкой крестика */
+    .PostDeleter{
+        border: none;
+        float: right;
+        margin: 0 5px;
+        padding: 0 5px;
+        background: white;
+        cursor: pointer;
+    }
 
-/* Контейнер для отступа кнопки открывающей меню с удаленными постами от самих постов */
-#Indentdiv{
-    margin: 1%;
-}
+    /* id удаленного поста в выпадающем меню с удаленными постами */
+    .DeletedPostName{
+        margin: 0.5% 0;
+    }
 
-/* Крестик */
-.DeleterImage{
-    width: 2.5vw;
-    height: 2.5vw;
-}
+    /* Контейнер для отступа кнопки открывающей меню с удаленными постами от самих постов */
+    #IndentDiv{
+        margin: 1%;
+    }
 
-/* Настройки красивого скроллбара (не работает в firefox) */
-#DropMenuDeletedPosts::-webkit-scrollbar {
-    background-color: lightgray;
-    width: 10px;
-}
-#DropMenuDeletedPosts::-webkit-scrollbar-track{
-    border-radius: 10px;
-}
-#DropMenuDeletedPosts::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: linear-gradient(180deg, #00c6fb, #005bea);
-}
+    /* Крестик */
+    .DeleterImage{
+        width: 2.5vw;
+        height: 2.5vw;
+    }
+
+    #BackgroundFullScreen_PostDeleter{
+        width: 10vw;
+        height: 10vh;
+        position: fixed;
+        background: black;
+        opacity: 0.5;
+        z-index: 1000;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-self: center;
+    }
+
+    #AboutPostDeleter{
+        height: 50vh;
+        width: 50vw;
+        background: cornsilk;
+        border-radius: 10px;
+        font-size: 12pt;
+    }
+
+    /* Настройки красивого скроллбара (не работает в firefox) */
+    #DeletedPostsTableDiv::-webkit-scrollbar {
+        background-color: lightgray;
+        width: 10px;
+    }
+    #DeletedPostsTableDiv::-webkit-scrollbar-track{
+        border-radius: 10px;
+    }
+    #DeletedPostsTableDiv::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: linear-gradient(180deg, #00c6fb, #005bea);
+    }

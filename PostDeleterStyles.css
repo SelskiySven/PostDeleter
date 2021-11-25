@@ -29,6 +29,7 @@
         border-radius: 0  0 10px 10px;
         width: 200px;
         min-height: 25px;
+        padding-bottom: 10px;
     }
 
     /* Контейнер в меню с удаленными постами */
@@ -61,6 +62,10 @@
         min-height: 25px;
         font-size: 12pt;
         font-weight: 600;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+        -moz-user-select: none;
     }
 
     .MainMenuItem:hover{
@@ -70,12 +75,6 @@
 
     #IndentDiv2{
         height: 10px;
-    }
-
-    /* Текст функций основного меню */
-    .MainMenuItem:first-child{
-        justify-content: center;
-        align-items: center;
     }
 
     /* Меню с очисткой данных */
@@ -116,7 +115,7 @@
     }
 
     /* Полоска в главном меню для разделения элементов */
-    #Strip{
+    .Strips{
         margin: 0;
     }
 
@@ -154,24 +153,26 @@
     }
 
     #BackgroundFullScreen_PostDeleter{
-        width: 10vw;
-        height: 10vh;
+        width: 100vw;
+        height: 100vh;
         position: fixed;
         background: black;
         opacity: 0.5;
         z-index: 1000;
         top: 0;
-        display: flex;
-        align-items: center;
-        justify-self: center;
     }
 
     #AboutPostDeleter{
+        position: fixed;
+        opacity: 1;
         height: 50vh;
         width: 50vw;
         background: cornsilk;
         border-radius: 10px;
         font-size: 12pt;
+        top: 25vh;
+        left: 25vw;
+        z-index: 1001;
     }
 
     /* Настройки красивого скроллбара (не работает в firefox) */

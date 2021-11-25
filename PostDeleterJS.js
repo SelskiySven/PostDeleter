@@ -109,10 +109,15 @@ function Create_div_for_menus() {
 }
 Create_div_for_menus()
 
+function Append_Strip(elem){    //Функция для добавления разделителя
+    let Strip = document.createElement("hr")    //Создание тега hr для разделения элементов меню
+    Strip.className = "Strips"
+    elem.append(Strip)
+}
+
+
 //Функция для создания главного меню
 function Create_main_menu() {
-    let Strip = document.createElement("hr")    //Создание тега hr для разделения элементов меню
-    Strip.id = "Strip"
 
     let Main_menu_div = document.createElement("div")   //Создание контейнера для кнопки, открывающей меню, и самого меню
     Main_menu_div.id = "MainMenuDiv"
@@ -173,8 +178,28 @@ function Create_main_menu() {
     Clear_cache_NO.onclick = function () {  //Закрываем меню с подтверждением удаления
         document.getElementById("ClearCacheMenu").hidden = true
     }
-    Clear_cache_menu.append(Strip, Clear_cache_sure, Clear_cache_YES, Clear_cache_NO)
+    Append_Strip(Clear_cache_menu)
+    Clear_cache_menu.append(Clear_cache_sure, Clear_cache_YES, Clear_cache_NO)
     Main_menu.append(Clear_cache_menu)
+
+    let About_PostDeleter=document.createElement("div") //Создание справки
+    let Background_About_PostDeleter = document.createElement("div")
+    About_PostDeleter.id = "AboutPostDeleter"
+    Background_About_PostDeleter.id = "BackgroundFullScreen_PostDeleter"
+    Background_About_PostDeleter.hidden = true
+    About_PostDeleter.hidden = true
+    document.body.append(Background_About_PostDeleter,About_PostDeleter)
+
+    let About_Div = document.createElement("div")   //Создание кнопки открытия справки
+    About_Div.className="MainMenuItem"
+    About_Div.innerHTML="Справка"
+    About_Div.id="AboutPostDeleterMenuItem"
+    About_Div.onclick = function(){
+        Background_About_PostDeleter.hidden = false
+        About_PostDeleter.hidden = false
+    }
+    Append_Strip(Main_menu)
+    Main_menu.append(About_Div)
 
     let Indent_div_2 = document.createElement("div")
     Indent_div_2.id = "IndentDiv2"

@@ -16,6 +16,7 @@ let More_posts_button = document.getElementById("feed-new-message-inf-wrap-first
 const Resources = chrome.runtime.getURL("Resources")
 
 const Deleter_button_path = Resources + "/delete.svg"
+const About_iframe_path = Resources + "/about.html"
 
 let starts = setInterval(Load_new_posts_button, 100)
 
@@ -109,7 +110,7 @@ function Create_div_for_menus() {
 }
 Create_div_for_menus()
 
-function Append_Strip(elem){    //Функция для добавления разделителя
+function Append_Strip(elem) {    //Функция для добавления разделителя
     let Strip = document.createElement("hr")    //Создание тега hr для разделения элементов меню
     Strip.className = "Strips"
     elem.append(Strip)
@@ -182,24 +183,43 @@ function Create_main_menu() {
     Clear_cache_menu.append(Clear_cache_sure, Clear_cache_YES, Clear_cache_NO)
     Main_menu.append(Clear_cache_menu)
 
-    let About_PostDeleter=document.createElement("div") //Создание справки
+    let About_PostDeleter = document.createElement("div") //Создание справки
     let Background_About_PostDeleter = document.createElement("div")
     About_PostDeleter.id = "AboutPostDeleter"
-    Background_About_PostDeleter.id = "BackgroundFullScreen_PostDeleter"
+    Background_About_PostDeleter.id = "BackgroundFullScreenPostDeleter"
     Background_About_PostDeleter.hidden = true
     About_PostDeleter.hidden = true
-    document.body.append(Background_About_PostDeleter,About_PostDeleter)
+    document.body.append(Background_About_PostDeleter, About_PostDeleter)
+    let About_Posdeleter_body = document.createElement("iframe")
+    About_Posdeleter_body.src = About_iframe_path
+    About_Posdeleter_body.id = "AboutBody"
+    let About_Postdeleter_header = document.createElement("div")
+    About_Postdeleter_header.id = "AboutHeader"
+    About_Postdeleter_header.innerHTML = "<h1>PostDeleter v3.4</h1>"    //<<<<<PostDeleter Version
+    About_PostDeleter.append(About_Postdeleter_header,About_Posdeleter_body)
+    let Close_about_button = document.createElement("button")
+    Close_about_button.id = "CloseAboutButton"
+    Close_about_button.onclick = function () {
+        Background_About_PostDeleter.hidden = true
+        About_PostDeleter.hidden = true
+    }
+    About_Postdeleter_header.append(Close_about_button)
+    let Close_about_image = document.createElement("img")
+    Close_about_image.src = Deleter_button_path
+    Close_about_image.id = "CloseAboutImage"
+    Close_about_button.append(Close_about_image)
 
-    let About_Div = document.createElement("div")   //Создание кнопки открытия справки
-    About_Div.className="MainMenuItem"
-    About_Div.innerHTML="Справка"
-    About_Div.id="AboutPostDeleterMenuItem"
-    About_Div.onclick = function(){
+
+    let About_Div_Menu_item = document.createElement("div")   //Создание кнопки открытия справки
+    About_Div_Menu_item.className = "MainMenuItem"
+    About_Div_Menu_item.innerHTML = "Справка"
+    About_Div_Menu_item.id = "AboutPostDeleterMenuItem"
+    About_Div_Menu_item.onclick = function () {
         Background_About_PostDeleter.hidden = false
         About_PostDeleter.hidden = false
     }
     Append_Strip(Main_menu)
-    Main_menu.append(About_Div)
+    Main_menu.append(About_Div_Menu_item)
 
     let Indent_div_2 = document.createElement("div")
     Indent_div_2.id = "IndentDiv2"

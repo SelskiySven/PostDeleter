@@ -127,12 +127,12 @@
     }
 
     /* Контейнер с картинкой крестика */
-    .PostDeleter{
+    .PostDeleter, #CloseAboutButton{
         border: none;
         float: right;
         margin: 0 5px;
         padding: 0 5px;
-        background: white;
+        background: inherit;
         cursor: pointer;
     }
 
@@ -147,12 +147,13 @@
     }
 
     /* Крестик */
-    .DeleterImage{
-        width: 2.5vw;
-        height: 2.5vw;
+    .DeleterImage, #CloseAboutImage{
+        width: 2vw;
+        height: 2vw;
     }
 
-    #BackgroundFullScreen_PostDeleter{
+    /* Затемнение при открытии справки */
+    #BackgroundFullScreenPostDeleter{
         width: 100vw;
         height: 100vh;
         position: fixed;
@@ -162,17 +163,29 @@
         top: 0;
     }
 
+    /* Справка */
     #AboutPostDeleter{
         position: fixed;
-        opacity: 1;
-        height: 50vh;
+        padding: 10px;
+        height: 80vh;
         width: 50vw;
         background: cornsilk;
         border-radius: 10px;
         font-size: 12pt;
-        top: 25vh;
+        top: 10vh;
         left: 25vw;
         z-index: 1001;
+    }
+
+    #AboutHeader{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #AboutBody{
+        width: 100%;
+        height: 90%;
+        border: none;
     }
 
     /* Настройки красивого скроллбара (не работает в firefox) */

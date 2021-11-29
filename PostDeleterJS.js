@@ -1,22 +1,21 @@
 //feed-new-message-inf-text feed-new-message-inf-text-reload new-message-balloon
 //feed-new-message-inf-text feed-new-message-inf-text-counter new-message-balloon
-//<div id="test123" style="width: 100vw;height: 100vh;position: fixed;background: black;z-index: 1000;opacity: 0.5;top: 0;"></div>
 //document.getElementsByClassName("bx24-connection-status-text-reload-title")[0].click()
 
 //>>>Переменные<<<//
-let Number_of_deleted_posts = 0     //Счетчик удаленных постов
 let Deleted_posts_array = []    //Массив с id удаленных постов
-
-let FeedWrap = document.querySelectorAll(".feed-wrap")[1]   //Это основная стена, все посты являются детьми этого элемента
-let PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0]     //Это элемент над стеной с постами в нем содержится надмись "Новости", а данный аддон создает в нем меню с удаленными постами
-let Posts_array = document.getElementsByClassName("feed-item-wrap")     //Cписок всех постов
-let More_posts_button = document.getElementById("feed-new-message-inf-wrap-first")  //Кнопка "Ещё события"
 
 //>>>Константы<<<//
 const Resources = chrome.runtime.getURL("Resources")
+const Manifest = chrome.runtime.getManifest()
 
 const Deleter_button_path = Resources + "/delete.svg"
 const About_iframe_path = Resources + "/about.html"
+
+const FeedWrap = document.querySelectorAll(".feed-wrap")[1]   //Это основная стена, все посты являются детьми этого элемента
+const PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0]     //Это элемент над стеной с постами в нем содержится надмись "Новости", а данный аддон создает в нем меню с удаленными постами
+const Posts_array = document.getElementsByClassName("feed-item-wrap")     //Cписок всех постов
+const More_posts_button = document.getElementById("feed-new-message-inf-wrap-first")  //Кнопка "Ещё события"
 
 let starts = setInterval(Load_new_posts_button, 100)
 
@@ -45,21 +44,28 @@ function Load_new_posts_button() {
     }
 }
 
-//Загрузка счетчика из локального хранилища
-if (localStorage.getItem("DeletedPosts") == null) {    //Если в локальном хранилище нет переменной, содержащей количество удаленных постов, значит аддон запущен впервые
-    Number_of_deleted_posts = 0
-} else {    //Иначе просто возьмем её значение
-    Number_of_deleted_posts = parseInt(localStorage.getItem("DeletedPosts"))
+//Для обратной совместимости
+if (localStorage.getItem("DeletedPosts") != null) {    //Если в локальном хранилище есть такая переменная, значит аддон использовался до версии 3.4
+    let Number_of_deleted_posts = parseInt(localStorage.getItem("DeletedPosts"))    //Получаем счетчик
+    for (let i = 0; i < Number_of_deleted_posts; i++) { //Перебираем старые переменные в локальном хранилище
+        Deleted_posts_array.push(localStorage.getItem("delpost" + i))   //Добавляем id в массив
+        localStorage.removeItem("delpost" + i)    //И удаляем переменную из млокального хранилища
+    }
+    localStorage.removeItem("DeletedPosts") //Удаляем переменную счетчика
+    localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Ставим новую переменную с массивом
 }
 
 //Удаление постов
 function Delete_posts() {
-    for (let i = 0; i < Number_of_deleted_posts; i++) {
-        Deleted_posts_array[i] = localStorage.getItem("delpost" + i)    //Помещаем id удаленных постов из локального хранилища в массив
-        Check_number_of_visible_posts()
-        try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
-            document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
-        } catch (error) {
+    if (localStorage.getItem("Deleted_posts_array") != null) {
+        Deleted_posts_array = localStorage.getItem("Deleted_posts_array").split(',')    //Помещаем id удаленных постов из локального хранилища в массив
+        for (postID of Deleted_posts_array) {
+            try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
+                document.getElementById(postID).parentNode.hidden = true
+                Check_number_of_visible_posts()
+            } catch (error) {
+                /////Сюда добавить счетчик
+            }
         }
     }
 }
@@ -77,15 +83,9 @@ function Create_deleter() {
         let Deleter = document.createElement("button") //Создаем кнопку
         Deleter.className = "PostDeleter"
         Deleter.onclick = function () {     //Функция нажатия на крестик
-            if (Number_of_deleted_posts == 0) { //Если в локальном хранилище отсутствует счетчик удаленных постов, то надо его создать
-                localStorage.setItem("DeletedPosts", 0)
-            }
-            localStorage.setItem("delpost" + Number_of_deleted_posts, Deleter.parentNode.parentNode.children[1].id)    //Добавляем в локальное хранилище id поста
-            Number_of_deleted_posts = Number_of_deleted_posts + 1     //Прибаляем к счетчику 1
-            localStorage.removeItem("DeletedPosts")     //Перезаписываем счетчик в локальное хранилище 
-            localStorage.setItem("DeletedPosts", Number_of_deleted_posts)
-            Deleter.parentNode.parentNode.hidden = true    //Удаляем пост
             Deleted_posts_array.push(this.parentNode.nextSibling.id)    //Добавляем в массив с удаленными постами id удаленого поста
+            localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Обновляем список удаленных постов в локальном хранилище
+            Deleter.parentNode.parentNode.hidden = true    //Удаляем пост
             Create_menu_with_deleted_posts()  //Пересоздаем меню со списком удаленных постов
             Check_number_of_visible_posts() //Проверяем количество видимых постов, чтобы не получилась пустая страница
         }
@@ -126,14 +126,13 @@ function Create_main_menu() {
 
     let Main_menu_button = document.createElement("button") //Создание кнопки для открытия основного меню
     Main_menu_button.id = "MainMenuButton"
-    Main_menu_button.innerHTML = "Меню"
+    Main_menu_button.innerText = "Меню"
     Main_menu_button.onclick = function () { //Функция для открытия меню
         Main_menu_button.classList.toggle("WhenMenuOpen")
         if (document.getElementById("MainMenu").hidden == true) {
             document.getElementById("MainMenu").hidden = false
         } else {
             document.getElementById("MainMenu").hidden = true
-            document.getElementById("ClearCacheMenu").hidden = true
         }
     }
     Main_menu_div.append(Main_menu_button)
@@ -144,44 +143,39 @@ function Create_main_menu() {
     Main_menu.hidden = true
     Main_menu_div.append(Main_menu)
 
+    let Check_updates = document.createElement("div")
+    Check_updates.className = "MainMenuItem"
+    Check_updates.innerHTML = "Проверить наличие <br> обновлений"
+    Check_updates.onclick = function(){
+        let xhr = new XMLHttpRequest;
+        let lastversion
+        xhr.open("GET", "https://api.github.com/repos/SelskiySven/PostDeleter/releases", true);
+        xhr.onload = function(){
+            lastversion=JSON.parse(xhr.response)
+            if (Manifest.version==lastversion[0].tag_name){
+                alert("Вы используете поледнюю версию PostDeleter")
+            }else {
+                if (confirm('Найдена новая версия, открыть страницу для скачивания?')){
+                    window.open(lastversion[0].html_url)
+                }
+            }
+          }
+        xhr.send()
+    }
+    Main_menu.append(Check_updates)
+    Append_Strip(Main_menu)
+
     let Clear_cache_div = document.createElement("div") //Очистка данных (если надо удалить аддон, то надо очистить данные в локальном хранилище)
     Clear_cache_div.className = "MainMenuItem"
-    Clear_cache_div.innerHTML = "Очистить данные"
+    Clear_cache_div.innerText = "Очистка данных"
     Clear_cache_div.id = "ClearCacheDiv"
     Clear_cache_div.onclick = function () { //Открытие меню с подтверждением действия
-        if (document.getElementById("ClearCacheMenu").hidden == true) {
-            document.getElementById("ClearCacheMenu").hidden = false
-        } else {
-            document.getElementById("ClearCacheMenu").hidden = true
+        if (confirm("Вы действительно хотите очистить данные?")) {
+            localStorage.removeItem("Deleted_posts_array")
+            location.reload()
         }
     }
     Main_menu.append(Clear_cache_div)
-
-    let Clear_cache_menu = document.createElement("div") //Меню с подтверждением очищения данных
-    Clear_cache_menu.id = "ClearCacheMenu"
-    Clear_cache_menu.hidden = true
-    let Clear_cache_sure = document.createElement("div")    //Контейнер с текстом
-    Clear_cache_sure.id = "ClearCacheSure"
-    Clear_cache_sure.innerHTML = "Очистить данные?"
-    let Clear_cache_YES = document.createElement("button")  //Кнопка подтверждения удаления
-    Clear_cache_YES.id = "ClearCacheYES"
-    Clear_cache_YES.innerHTML = "ДА"
-    Clear_cache_YES.onclick = function () { //Функция очистки данных
-        for (let i = 0; i < Number_of_deleted_posts; i++) { //Удаляем id удаленных постов
-            localStorage.removeItem("delpost" + i)
-        }
-        localStorage.removeItem("DeletedPosts") //Удаляем счетчик удаленных постов
-        location.reload()   //Перезагружаем страницу
-    }
-    let Clear_cache_NO = document.createElement("button")   //Кнопка отмены удаления
-    Clear_cache_NO.id = "ClearCacheNO"
-    Clear_cache_NO.innerHTML = "НЕТ"
-    Clear_cache_NO.onclick = function () {  //Закрываем меню с подтверждением удаления
-        document.getElementById("ClearCacheMenu").hidden = true
-    }
-    Append_Strip(Clear_cache_menu)
-    Clear_cache_menu.append(Clear_cache_sure, Clear_cache_YES, Clear_cache_NO)
-    Main_menu.append(Clear_cache_menu)
 
     let About_PostDeleter = document.createElement("div") //Создание справки
     let Background_About_PostDeleter = document.createElement("div")
@@ -195,8 +189,8 @@ function Create_main_menu() {
     About_Posdeleter_body.id = "AboutBody"
     let About_Postdeleter_header = document.createElement("div")
     About_Postdeleter_header.id = "AboutHeader"
-    About_Postdeleter_header.innerHTML = "<h1>PostDeleter v3.4</h1>"    //<<<<<PostDeleter Version
-    About_PostDeleter.append(About_Postdeleter_header,About_Posdeleter_body)
+    About_Postdeleter_header.innerHTML = "<h1>PostDeleter v" + Manifest.version + "</h1>"
+    About_PostDeleter.append(About_Postdeleter_header, About_Posdeleter_body)
     let Close_about_button = document.createElement("button")
     Close_about_button.id = "CloseAboutButton"
     Close_about_button.onclick = function () {
@@ -212,7 +206,7 @@ function Create_main_menu() {
 
     let About_Div_Menu_item = document.createElement("div")   //Создание кнопки открытия справки
     About_Div_Menu_item.className = "MainMenuItem"
-    About_Div_Menu_item.innerHTML = "Справка"
+    About_Div_Menu_item.innerText = "Справка"
     About_Div_Menu_item.id = "AboutPostDeleterMenuItem"
     About_Div_Menu_item.onclick = function () {
         Background_About_PostDeleter.hidden = false
@@ -240,7 +234,7 @@ function Create_menu_with_deleted_posts() {
     document.getElementById("DivForMenus").append(Menu_deleted_posts_div)
 
     let Menu_button_deleted_posts = document.createElement("button")    //Кнопка открывающая меню
-    Menu_button_deleted_posts.innerHTML = "Удаленные посты"
+    Menu_button_deleted_posts.innerText = "Удаленные посты"
     Menu_button_deleted_posts.id = "DeletedPostsMenu"
     Menu_button_deleted_posts.onclick = function () { //Функция открывающая и закрывающая меню
         Menu_button_deleted_posts.classList.toggle("WhenMenuOpen")
@@ -271,28 +265,21 @@ function Create_menu_with_deleted_posts() {
         let Deleted_post_name = document.createElement("th")    // id поста
         Deleted_post_name.id = "DeletedPostName" + i
         Deleted_post_name.className = "DeletedPostName"
-        Deleted_post_name.innerHTML = Deleted_posts_array[i]
+        Deleted_post_name.innerText = Deleted_posts_array[i]
         let Deleted_post_button = document.createElement("th")  //Место для кнопки
         Deleted_post_button.id = "DeletedPostButton" + i
         Deleted_posts_row.append(Deleted_post_name)
         Deleted_posts_row.append(Deleted_post_button)
         Deleted_post_button = document.createElement("button")  //Сама кнопка
-        Deleted_post_button.innerHTML = "Вернуть"
+        Deleted_post_button.innerText = "Вернуть"
         Deleted_post_button.onclick = function () { //Функция нажатия на кнопку "Вернуть"
             try {
                 document.getElementById(Deleted_posts_array[i]).parentNode.hidden = false  //Делаем пост снова видимым
             } catch (error) {
             }
             Deleted_posts_array.splice(i, 1)    //Удаляем его из списка удаленных постов
-            for (let j = 0; j < Deleted_posts_array.length; j++) {  //Перебираем локальное хранилище удаляя оттуда данный пост, т.к. локальное хранилище поддерживает только данные типа String и мы просто перезаписываем все записи
-                localStorage.removeItem("delpost" + j)
-                localStorage.setItem("delpost" + j, Deleted_posts_array[j])
-            }
-            localStorage.removeItem("delpost" + Deleted_posts_array.length) //Обновляем в локальном хранилище счетчик удаленных постов
-            this.parentNode.parentNode.remove()
-            localStorage.removeItem("DeletedPosts")
-            Number_of_deleted_posts = Number_of_deleted_posts - 1
-            localStorage.setItem("DeletedPosts", Number_of_deleted_posts)
+            localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Обновляем массив с id удаленных постов в локальном хранилище
+            this.parentNode.parentNode.remove() //Удаляем строку из меню
         }
         document.getElementById("DeletedPostButton" + i).append(Deleted_post_button)
     }

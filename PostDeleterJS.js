@@ -45,7 +45,7 @@ function Load_new_posts_button() {
 }
 
 //Для обратной совместимости
-if (localStorage.getItem("DeletedPosts") != null) {    //Если в локальном хранилище есть такая переменная, значит аддон использовался до версии 3.4
+if (localStorage.getItem("DeletedPosts") != null & localStorage.getItem("DeletedPosts") != '0') {    //Если в локальном хранилище есть такая переменная, значит аддон использовался до версии 3.4
     let Number_of_deleted_posts = parseInt(localStorage.getItem("DeletedPosts"))    //Получаем счетчик
     for (let i = 0; i < Number_of_deleted_posts; i++) { //Перебираем старые переменные в локальном хранилище
         Deleted_posts_array.push(localStorage.getItem("delpost" + i))   //Добавляем id в массив
@@ -55,10 +55,17 @@ if (localStorage.getItem("DeletedPosts") != null) {    //Если в локал�
     localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Ставим новую переменную с массивом
 }
 
+//Загрузка данных из локального хранилища
+function Get_data_from_localStorage() {
+    if (localStorage.getItem("Deleted_posts_array") != null & localStorage.getItem("Deleted_posts_array") != "") {
+        Deleted_posts_array = localStorage.getItem("Deleted_posts_array").split(',')    //Помещаем id удаленных постов из локального хранилища в массив
+    }
+}
+Get_data_from_localStorage()
+
 //Удаление постов
 function Delete_posts() {
-    if (localStorage.getItem("Deleted_posts_array") != null) {
-        Deleted_posts_array = localStorage.getItem("Deleted_posts_array").split(',')    //Помещаем id удаленных постов из локального хранилища в массив
+    if (Deleted_posts_array != []) {
         for (postID of Deleted_posts_array) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
                 document.getElementById(postID).parentNode.hidden = true
@@ -146,21 +153,21 @@ function Create_main_menu() {
     let Check_updates = document.createElement("div")
     Check_updates.className = "MainMenuItem"
     Check_updates.innerHTML = "Проверить наличие <br> обновлений"
-    Check_updates.onclick = function(){
+    Check_updates.onclick = function () {
         let xhr = new XMLHttpRequest;
         let lastversion
         xhr.open("GET", "https://api.github.com/repos/SelskiySven/PostDeleter/releases", true);
-        xhr.onload = function(){
-            lastversion=JSON.parse(xhr.response)
-            if (Manifest.version==lastversion[0].tag_name){
+        xhr.onload = function () {
+            lastversion = JSON.parse(xhr.response)
+            if (Manifest.version == lastversion[0].tag_name) {
                 alert("Вы используете поледнюю версию PostDeleter")
-            }else {
-                if (confirm('Найдена новая версия, открыть страницу для скачивания?')){
+            } else {
+                if (confirm('Найдена новая версия, открыть страницу для скачивания?')) {
                     window.open(lastversion[0].html_url)
                 }
             }
-          }
-        xhr.send()
+        }
+        xhr.send(null)
     }
     Main_menu.append(Check_updates)
     Append_Strip(Main_menu)

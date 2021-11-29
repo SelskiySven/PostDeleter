@@ -23,6 +23,10 @@
         "32": "icons/icon32.png",
         "48": "icons/icon48.png"
       },
+      "permissions": [
+        "https://api.github.com/repos/SelskiySven/PostDeleter/releases",
+        "webRequest"
+      ],
       "browser_specific_settings": {
         "gecko": {
           "id": "{a170793d-f765-4dac-9b46-ee99ef78e38b}"

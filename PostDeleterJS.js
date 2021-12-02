@@ -55,6 +55,7 @@ if (localStorage.getItem("DeletedPosts") != null) {    //Если в локал�
     localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Ставим новую переменную с массивом
 }
 if (localStorage.getItem("Nums_of_non_loaded_post") == null & localStorage.getItem("Deleted_posts_array") != null) { //Если в локальном хранилище нет такой переменной, значит аддон использовался до версии 3.6 и ее требуется создать
+    Deleted_posts_array = localStorage.getItem("Deleted_posts_array").split(',')
     for (i of Deleted_posts_array) {
         Nums_of_non_loaded_post.push(0)
     }

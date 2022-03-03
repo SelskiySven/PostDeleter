@@ -1,16 +1,16 @@
     /* Класс для заострения уголков кнопки меню с удаленными постами */
-    .WhenMenuOpen{
+    .PostDeleter_WhenMenuOpen{
         border-radius: 10px 10px 0 0 !important;
     }
 
     /* Контейнер для меню */
-    #DivForMenus{
+    #PostDeleter_DivForMenus{
         display: flex;
         flex-direction: row;
     }
 
     /* Кнопка для открытия меню с удаленными постами и основного меню*/
-    #DeletedPostsMenu, #MainMenuButton{
+    #PostDeleter_DeletedPostsMenu, #PostDeleter_MainMenuButton{
         background-color: #3498DB;
         border: none;
         cursor: pointer;
@@ -21,7 +21,7 @@
     }
     
     /* Меню с удаленными постами */
-    #DropMenuDeletedPosts{
+    #PostDeleter_DropMenuDeletedPosts{
         position: absolute;
         background-color: lightgray;
         z-index: 12;
@@ -33,7 +33,7 @@
     }
 
     /* Контейнер в меню с удаленными постами */
-    #DeletedPostsTableDiv{
+    #PostDeleter_DeletedPostsTableDiv{
         width: 190px;
         overflow-y: scroll;
         scrollbar-color: rgb(80, 163, 190) lightgray;
@@ -42,7 +42,7 @@
     }
 
     /* Основное меню */
-    #MainMenu{
+    #PostDeleter_MainMenu{
         position: absolute;
         background-color: lightgray;
         z-index: 12;
@@ -50,12 +50,12 @@
         border-radius: 0 0 10px 10px;
     }
 
-    #DeletedPostsMenu:hover, #MainMenuButton:hover{
+    #PostDeleter_DeletedPostsMenu:hover, #PostDeleter_MainMenuButton:hover{
         background-color: #2980B9;
     }
 
     /* Функции основного меню */
-    .MainMenuItem{
+    .PostDeleter_MainMenuItem{
         transition: background-color .3s;
         cursor: pointer;
         display: table-cell;
@@ -69,29 +69,29 @@
         -moz-user-select: none;
     }
 
-    .MainMenuItem:hover{
+    .PostDeleter_MainMenuItem:hover{
         transition: background-color .3s;
         background-color: rgb(231, 231, 231);
     }
 
-    #IndentDiv2{
+    #PostDeleter_IndentDiv2{
         height: 10px;
     }
 
     /* Полоска в главном меню для разделения элементов */
-    .Strips{
+    .PostDeleter_Strips{
         margin: 0;
     }
 
     /* Контейнер в котором находится крестик */
-    .PostDeleterDiv{
+    .PostDeleter_PostDeleterDiv{
         display: flex;
         background-color: white;
         justify-content: flex-end;
     }
 
     /* Контейнер с картинкой крестика */
-    .PostDeleter, #CloseAboutButton{
+    .PostDeleter_PostDeleter, #PostDeleter_CloseAboutButton, #PostDeleter_CloseSettingsButton{
         border: none;
         float: right;
         padding: 5px;
@@ -100,17 +100,17 @@
     }
 
     /* id удаленного поста в выпадающем меню с удаленными постами */
-    .DeletedPostName{
+    .PostDeleter_DeletedPostName{
         margin: 0.5% 0;
     }
 
     /* Контейнер для отступа кнопки открывающей меню с удаленными постами от самих постов */
-    #IndentDiv{
+    #PostDeleter_IndentDiv{
         margin: 1%;
     }
 
     /* Крестик */
-    .DeleterImage, #CloseAboutImage{
+    .PostDeleter_DeleterImage, #PostDeleter_CloseAboutImage, #PostDeleter_CloseSettingsImage{
         width: 2vw;
         height: 2vw;
         background-color: #F69291;
@@ -118,7 +118,7 @@
     }
 
     /* Затемнение при открытии справки */
-    #BackgroundFullScreenPostDeleter{
+    #PostDeleter_BackgroundFullScreenPostDeleter{
         width: 100vw;
         height: 100vh;
         position: fixed;
@@ -129,7 +129,7 @@
     }
 
     /* Справка */
-    #AboutPostDeleter{
+    #PostDeleter_AboutPostDeleter, #PostDeleter_SettingsPostDeleter{
         position: fixed;
         padding: 10px;
         height: 80vh;
@@ -142,26 +142,34 @@
         z-index: 1001;
     }
 
-    #AboutHeader{
+    /*Элементы справки */
+    .SettingsItem{
+        width: 100%;
         display: flex;
         justify-content: space-between;
     }
 
-    #AboutBody{
+    /* Заголовки справки и настроек */
+    #PostDeleter_AboutHeader, #PostDeleter_SettingsHeader{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #PostDeleter_AboutBody{
         width: 100%;
         height: 90%;
         border: none;
     }
 
     /* Настройки красивого скроллбара (не работает в firefox) */
-    #DeletedPostsTableDiv::-webkit-scrollbar {
+    #PostDeleter_DeletedPostsTableDiv::-webkit-scrollbar {
         background-color: lightgray;
         width: 10px;
     }
-    #DeletedPostsTableDiv::-webkit-scrollbar-track{
+    #PostDeleter_DeletedPostsTableDiv::-webkit-scrollbar-track{
         border-radius: 10px;
     }
-    #DeletedPostsTableDiv::-webkit-scrollbar-thumb {
+    #PostDeleter_DeletedPostsTableDiv::-webkit-scrollbar-thumb {
         border-radius: 10px;
         background: linear-gradient(180deg, #00c6fb, #005bea);
     }

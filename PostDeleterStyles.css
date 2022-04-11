@@ -16,7 +16,7 @@
         cursor: pointer;
         font-size: 14pt;
         border-radius: 10px;
-        width: 200px;
+        width: 210px;
         margin-right: 5px;
     }
     
@@ -27,14 +27,14 @@
         z-index: 12;
         max-height: 50vh;
         border-radius: 0  0 10px 10px;
-        width: 200px;
+        width: 210px;
         min-height: 25px;
         padding-bottom: 10px;
     }
 
     /* Контейнер в меню с удаленными постами */
     #PostDeleter_DeletedPostsTableDiv{
-        width: 190px;
+        width: 200px;
         overflow-y: scroll;
         scrollbar-color: rgb(80, 163, 190) lightgray;
         scrollbar-width: thin;
@@ -46,7 +46,7 @@
         position: absolute;
         background-color: lightgray;
         z-index: 12;
-        width: 200px;
+        width: 210px;
         border-radius: 0 0 10px 10px;
     }
 
@@ -61,7 +61,7 @@
         display: table-cell;
         text-align: center;
         vertical-align: middle;
-        width: 200px;
+        width: 210px;
         padding: 5px 0;
         font-size: 12pt;
         font-weight: 600;

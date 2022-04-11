@@ -1,6 +1,7 @@
 //feed-new-message-inf-text feed-new-message-inf-text-reload new-message-balloon
 //feed-new-message-inf-text feed-new-message-inf-text-counter new-message-balloon
 //document.getElementsByClassName("bx24-connection-status-text-reload-title")[0].click()
+//
 
 //>>>Переменные<<<//
 let Deleted_posts_array = []    //Массив с id удаленных постов
@@ -21,15 +22,18 @@ let starts = setInterval(Load_new_posts_button, 100)
 
 //Функция для загрузки кнопки "Ещё события", для того чтобы нажать на нее в случае необходимости
 function Load_new_posts_button() {
+    let h = pageYOffset
+    let w = pageXOffset
     if (More_posts_button != null) {   //Выполняем только если есть кнопка "Ещё события"
-        if (More_posts_button.style.display == "none") {   //Значит кнопка уже нажата
+        if (More_posts_button.offsetHeight == 0 & More_posts_button.offsetWidth == 0) {   //Значит кнопка уже нажата
             clearInterval(starts)
         } else {
             if (More_posts_button.className == "feed-new-message-inf-wrap-first") {    //Иначе спускаемся в самый низ для активации скрипта сайта для загрузки этой кнопки
-                window.scroll(0, document.body.scrollHeight)
+                window.scroll(w, document.body.scrollHeight)
             }
-            if (More_posts_button.className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible") {    //Кнопка подгрузилась значит возвращаемся в начало страницы и завершаем данную функцию
-                window.scroll(0, 0)
+            if (More_posts_button.className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible feed-new-message-inf-wrap-first-active") {    //Кнопка подгрузилась значит возвращаемся в начало страницы и завершаем данную функцию
+                window.scroll(w, h)
+                Check_number_of_visible_posts()
                 try {
                     clearInterval(starts)
                 } catch (error) {
@@ -181,7 +185,7 @@ function Create_main_menu() {
     Settings_PostDeleter_window.append(Settings_header)
     let Close_settings_button = document.createElement("button")
     Close_settings_button.id = "PostDeleter_CloseSettingsButton"
-    Close_settings_button.onclick = function(){
+    Close_settings_button.onclick = function () {
         Background_Fullscreen_PostDeleter.hidden = true
         Settings_PostDeleter_window.hidden = true
     }
@@ -215,9 +219,9 @@ function Create_main_menu() {
     Main_menu_div.append(Main_menu)
 
     let Settings_PostDeleter = document.createElement("div")
-    Settings_PostDeleter.className="PostDeleter_MainMenuItem"
-    Settings_PostDeleter.innerText="Настройки"
-    Settings_PostDeleter.onclick = function(){
+    Settings_PostDeleter.className = "PostDeleter_MainMenuItem"
+    Settings_PostDeleter.innerText = "Настройки"
+    Settings_PostDeleter.onclick = function () {
         Settings_PostDeleter_window.hidden = false
         Background_Fullscreen_PostDeleter.hidden = false
     }
@@ -287,6 +291,9 @@ function Create_main_menu() {
         if (confirm("Вы действительно хотите очистить данные?")) {
             localStorage.removeItem("Deleted_posts_array")
             localStorage.removeItem("Nums_of_non_loaded_post")
+            Nums_of_non_loaded_post = []
+            Deleted_posts_array = []
+            Create_menu_with_deleted_posts()
             alert("Данные успешно очищены")
         }
     }
@@ -400,20 +407,17 @@ function Check_number_of_visible_posts() {
 
 //Функция для загрузки новых постов
 function Add_more_posts() {
-    if (document.getElementById("sonet_log_more_container_first") != null) { //Если кнопка существует (в поиске ее не существует)
-        if (document.getElementById("sonet_log_more_container_first").parentNode.style.display != "none") { //Если есть кнопка "Еще события", то нажимаем на неё
-            document.getElementById("sonet_log_more_container_first").click()
-        } else {    //Если нет, то запускаем триггер для загрузки новых постов(он запускается, когда пользователь опускается вниз страницы)
-            let h = pageYOffset
-            let w = pageXOffset
-            window.scroll(0, 0)
-            setTimeout(() => {
-                window.scroll(w, document.body.scrollHeight) //Опускаемся в самый низ
-                setTimeout(() => {  //Через 100 милисекунд возвращаемся на предыдущую позицию
-                    window.scroll(w, h)
-                }, 100);
+    if (document.getElementById("LIVEFEED_search").value == "") { //Если в поиске ничего не набрано
+        let h = pageYOffset
+        let w = pageXOffset
+        window.scroll(0, 0)
+        setTimeout(() => {
+            window.scroll(w, document.body.scrollHeight) //Опускаемся в самый низ
+            setTimeout(() => {  //Через 100 милисекунд возвращаемся на предыдущую позицию
+                window.scroll(w, h)
             }, 100);
-        }
+        }, 100);
+
     }
 }
 
@@ -432,6 +436,18 @@ function Create_observers() {
 }
 Create_observers()
 
+function Create_observers_2(){
+    try {
+        const Observer_more_posts_button = new MutationObserver(Try_click_more_posts_button)
+        Observer_more_posts_button.observe(document.getElementById("feed-new-message-inf-wrap-first"), config = {
+            attributes: true
+        })
+    } catch (error) {
+        
+    }
+}
+Create_observers_2()
+
 function Post_has_been_added() {     //Мультифункция на случай добавления нового поста
     setTimeout(() => {
         Create_deleter()
@@ -442,8 +458,16 @@ function Сontainer_has_been_added() {    //Мультифункция на сл
     setTimeout(() => {
         Delete_posts()
         Create_deleter()
+        Create_observers_2()
         starts = setInterval(Load_new_posts_button, 100) //На случай, если выходим из поиска
     }, 10);
+}
+
+function Try_click_more_posts_button(){
+    try {
+        document.getElementById("feed-new-message-inf-loader-first").click()
+    } catch (error) {
+    }
 }
 
 function Authorized() { //Функция проверки, находимся ли мы на портали или странице авторизации

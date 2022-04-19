@@ -6,13 +6,15 @@
 //>>>Переменные<<<//
 let Deleted_posts_array = []    //Массив с id удаленных постов
 let Nums_of_non_loaded_post = []  //Массив с количсетвом неудачных попыток скрыть пост, он может быть неподжгружен
+let Minimum_number_of_posts = 5
 let Posts_array = document.getElementsByClassName("feed-item-wrap")     //Cписок всех постов
 
 //>>>Константы<<<//
 const Resources = chrome.runtime.getURL("Resources")
 const Manifest = chrome.runtime.getManifest()
 
-const About_iframe_path = Resources + "/about.html"
+const About_path = Resources + "/about.html"
+const Settings_path = Resources + "/settings.html"
 
 const FeedWrap = document.querySelectorAll(".feed-wrap")[1]   //Это основная стена, все посты являются детьми этого элемента
 const PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0]     //Это элемент над стеной с постами в нем содержится надмись "Новости", а данный аддон создает в нем меню с удаленными постами
@@ -76,6 +78,9 @@ function Get_data_from_localStorage() {
                 Nums_of_non_loaded_post[i] = parseInt(Nums_of_non_loaded_post[i]) + 1
             }
             localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)    //Загружаем его в localStorage
+        }
+        if (localStorage.getItem("Minimum_Number_Of_Posts") != null) {
+            Minimum_number_of_posts = parseInt(localStorage.getItem("Minimum_Number_Of_Posts"), 10)
         }
     }
 }
@@ -158,8 +163,13 @@ function Create_main_menu() {
     Background_Fullscreen_PostDeleter.hidden = true
     About_PostDeleter.hidden = true
     document.body.append(Background_Fullscreen_PostDeleter, About_PostDeleter)
-    let About_Posdeleter_body = document.createElement("iframe")
-    About_Posdeleter_body.src = About_iframe_path
+    let About_Posdeleter_body = document.createElement("div")
+    let Get_about = new XMLHttpRequest
+    Get_about.open("GET", About_path, true)
+    Get_about.onload = function () {
+        About_Posdeleter_body.innerHTML = Get_about.response
+    }
+    Get_about.send()
     About_Posdeleter_body.id = "PostDeleter_AboutBody"
     let About_Postdeleter_header = document.createElement("div")
     About_Postdeleter_header.id = "PostDeleter_AboutHeader"
@@ -193,6 +203,23 @@ function Create_main_menu() {
     let Close_settings_image = document.createElement("div")
     Close_settings_image.id = "PostDeleter_CloseSettingsImage"
     Close_settings_button.append(Close_settings_image)
+    let Settings_body = document.createElement("div")
+    Settings_body.id = "PostDeleter_SettingsBody"
+    Settings_PostDeleter_window.append(Settings_body)
+    let Get_settings = new XMLHttpRequest
+    Get_settings.open("GET", Settings_path, true)
+    Get_settings.onload = function () {
+        Settings_body.innerHTML = Get_settings.response
+        //Настройка настроек
+        document.getElementById("PostDeleter_MinimumNumberOfPosts").value = Minimum_number_of_posts
+        document.getElementById("PostDeleter_MinimumNumberOfPostsValue").innerText = Minimum_number_of_posts
+        document.getElementById("PostDeleter_SaveMinimumNumberOfPosts").onclick = function () {
+            Minimum_number_of_posts = document.getElementById("PostDeleter_MinimumNumberOfPosts").value
+            localStorage.setItem("Minimum_Number_Of_Posts", Minimum_number_of_posts)
+            Check_number_of_visible_posts()
+        }
+    }
+    Get_settings.send()
     document.body.append(Settings_PostDeleter_window)
 
     let Main_menu_div = document.createElement("div")   //Создание контейнера для кнопки, открывающей меню, и самого меню
@@ -265,11 +292,11 @@ function Create_main_menu() {
     Check_updates.className = "PostDeleter_MainMenuItem"
     Check_updates.innerText = "Проверка наличия обновлений"
     Check_updates.onclick = function () {
-        let xhr = new XMLHttpRequest;
+        let Get_github_info = new XMLHttpRequest;
         let Github_info
-        xhr.open("GET", "https://api.github.com/repos/SelskiySven/PostDeleter/releases", true);
-        xhr.onload = function () {
-            Github_info = JSON.parse(xhr.response)
+        Get_github_info.open("GET", "https://api.github.com/repos/SelskiySven/PostDeleter/releases", true);
+        Get_github_info.onload = function () {
+            Github_info = JSON.parse(Get_github_info.response)
             if (Manifest.version == Github_info[0].tag_name) {
                 alert("Вы используете поледнюю версию PostDeleter")
             } else {
@@ -278,7 +305,7 @@ function Create_main_menu() {
                 }
             }
         }
-        xhr.send(null)
+        Get_github_info.send(null)
     }
     Main_menu.append(Check_updates)
     Append_Strip(Main_menu)
@@ -291,6 +318,7 @@ function Create_main_menu() {
         if (confirm("Вы действительно хотите очистить данные?")) {
             localStorage.removeItem("Deleted_posts_array")
             localStorage.removeItem("Nums_of_non_loaded_post")
+            localStorage.removeItem("Minimum_Number_Of_Posts")
             Nums_of_non_loaded_post = []
             Deleted_posts_array = []
             Create_menu_with_deleted_posts()
@@ -400,7 +428,7 @@ function Check_number_of_visible_posts() {
             Visible_posts_array.splice(i, 1)
         }
     }
-    if (Visible_posts_array.length < 5) {   //Если отображаемых постов меньше 5, то зарпускаем триггер для загрузки дополнительных постов
+    if (Visible_posts_array.length < Minimum_number_of_posts) {   //Если отображаемых постов меньше 5, то зарпускаем триггер для загрузки дополнительных постов
         Add_more_posts()
     }
 }
@@ -436,14 +464,14 @@ function Create_observers() {
 }
 Create_observers()
 
-function Create_observers_2(){
+function Create_observers_2() {
     try {
         const Observer_more_posts_button = new MutationObserver(Try_click_more_posts_button)
         Observer_more_posts_button.observe(document.getElementById("feed-new-message-inf-wrap-first"), config = {
             attributes: true
         })
     } catch (error) {
-        
+
     }
 }
 Create_observers_2()
@@ -463,7 +491,7 @@ function Сontainer_has_been_added() {    //Мультифункция на сл
     }, 10);
 }
 
-function Try_click_more_posts_button(){
+function Try_click_more_posts_button() {
     try {
         document.getElementById("feed-new-message-inf-loader-first").click()
     } catch (error) {

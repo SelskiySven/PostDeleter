@@ -8,6 +8,31 @@
         display: flex;
         flex-direction: row;
     }
+    .PostDeleter_SettingsItem{
+        display: flex;
+        flex-direction: row;
+        justify-content: baseline;
+        height: 20px;
+        margin: 5px 0;
+        align-items: center;
+    }
+    .PostDeleter_SettingsItem>*{
+        height: 20px;
+        padding: 0;
+        margin: 0 20px 0 0;
+    }
+
+    .PostDeleter_SettingsItemDescription{
+        margin: 0;
+        font-size: 18pt;
+        font-weight: 700;
+    }
+
+    #PostDeleter_SettingsBody{
+        display: flex;
+        flex-direction: column;
+
+    }
 
     /* Кнопка для открытия меню с удаленными постами и основного меню*/
     #PostDeleter_DeletedPostsMenu, #PostDeleter_MainMenuButton{

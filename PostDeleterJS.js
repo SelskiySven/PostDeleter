@@ -17,9 +17,8 @@ const About_path = Resources + "/about.html"
 const Settings_path = Resources + "/settings.html"
 
 const FeedWrap = document.querySelectorAll(".feed-wrap")[1]   //Это основная стена, все посты являются детьми этого элемента
-const PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0]     //Это элемент над стеной с постами в нем содержится надмись "Новости", а данный аддон создает в нем меню с удаленными постами
+const PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0]     //Это элемент над стеной с постами в нем содержится надпись "Новости", а данный аддон создает в нем меню с удаленными постами
 const More_posts_button = document.getElementById("feed-new-message-inf-wrap-first")  //Кнопка "Ещё события"
-const More_posts_button_for_click = document.getElementById("feed-new-message-inf-text-first") // Для клика на кнопку "Ещё события"
 
 //Для обратной совместимости
 if (localStorage.getItem("DeletedPosts") != null) {    //Если в локальном хранилище есть такая переменная, значит аддон использовался до версии 3.5
@@ -63,8 +62,8 @@ function Delete_posts() {
         for (let i = 0; i < Deleted_posts_array.length; i++) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
                 if (document.getElementById(Deleted_posts_array[i]).parentNode.hidden == false) {  //Если данный элемент не скрыт, значит он загружен на страницу
-                    if (Nums_of_non_loaded_post[i]>0){
-                    Nums_of_non_loaded_post[i]--
+                    if (Nums_of_non_loaded_post[i] > 0) {
+                        Nums_of_non_loaded_post[i]--
                     }
                     localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
                 }
@@ -186,13 +185,20 @@ function Create_main_menu() {
         //Настройка настроек
         document.getElementById("PostDeleter_MinimumNumberOfPosts").value = Minimum_number_of_posts
         document.getElementById("PostDeleter_MinimumNumberOfPostsValue").innerText = Minimum_number_of_posts
-        document.getElementById("PostDeleter_SaveMinimumNumberOfPosts").onclick = function () {
-            Minimum_number_of_posts = document.getElementById("PostDeleter_MinimumNumberOfPosts").value
-            localStorage.setItem("Minimum_Number_Of_Posts", Minimum_number_of_posts)
-            Check_number_of_visible_posts()
-        }
     }
     Get_settings.send()
+    let Settings_footer = document.createElement("div")
+    Settings_footer.id = "PostDeleter_SettingsFooter"
+    let Save_settings = document.createElement("button")
+    Save_settings.id = "PostDeleter_SaveSettings"
+    Save_settings.innerText = "Сохранить"
+    Save_settings.onclick = function () {
+        Minimum_number_of_posts = document.getElementById("PostDeleter_MinimumNumberOfPosts").value
+        localStorage.setItem("Minimum_Number_Of_Posts", Minimum_number_of_posts)
+        Check_number_of_visible_posts()
+    }
+    Settings_footer.append(Save_settings)
+    Settings_PostDeleter_window.append(Settings_footer)
     document.body.append(Settings_PostDeleter_window)
 
     let Main_menu_div = document.createElement("div")   //Создание контейнера для кнопки, открывающей меню, и самого меню
@@ -386,22 +392,17 @@ function Create_menu_with_deleted_posts() {
         }
         document.getElementById("DeletedPostButton" + i).append(Deleted_post_button)
     }
-
-    let Indent_div = document.createElement("div")    //Создание контейнера для отступа кнопки "Удаленные посты" от контейнера с постами
-    Indent_div.id = "PostDeleter_IndentDiv"
-    PagetitleWrap.append(Indent_div)
-
 }
 
 //Функция для подсчета количества отображаемых постов
 function Check_number_of_visible_posts() {
-    let Visible_posts_array = Array.from(Posts_array)
-    for (let i = Visible_posts_array.length - 1; i >= 0; i--) {
-        if (Visible_posts_array[i].offsetWidth == 0 || Visible_posts_array[i].offsetHeight == 0) {   //Считаем количество отображаемых постов
-            Visible_posts_array.splice(i, 1)
+    let Number_of_visible_posts = Posts_array.length
+    for (Post of Posts_array) {
+        if (Post.offsetWidth == 0 || Post.offsetHeight == 0) {   //Считаем количество отображаемых постов
+            Number_of_visible_posts--
         }
     }
-    if (Visible_posts_array.length < Minimum_number_of_posts) {   //Если отображаемых постов меньше 5, то зарпускаем триггер для загрузки дополнительных постов
+    if (Number_of_visible_posts < Minimum_number_of_posts) {   //Если отображаемых постов меньше 5, то зарпускаем триггер для загрузки дополнительных постов
         Add_more_posts()
     }
 }
@@ -411,6 +412,7 @@ function Add_more_posts() {
     if (document.getElementById("LIVEFEED_search").value == "") { //Если в поиске ничего не набрано
         let h = pageYOffset
         let w = pageXOffset
+        window.scroll(0, 0)
         setTimeout(() => {
             window.scroll(w, document.body.scrollHeight) //Опускаемся в самый низ
             setTimeout(() => {  //Через 100 милисекунд возвращаемся на предыдущую позицию
@@ -436,13 +438,15 @@ function Create_observers() {
 Create_observers()
 
 function Create_observers_2() {
-    try {
-        const Observer_more_posts_button = new MutationObserver(Try_click_more_posts_button)
-        Observer_more_posts_button.observe(More_posts_button, config = {
-            attributes: true
-        })
-    } catch (error) {
+    if (Authorized()) {
+        try {
+            const Observer_more_posts_button = new MutationObserver(Try_click_more_posts_button)
+            Observer_more_posts_button.observe(document.getElementById("feed-new-message-inf-wrap-first"), config = {
+                attributes: true
+            })
+        } catch (error) {
 
+        }
     }
 }
 Create_observers_2()
@@ -463,7 +467,7 @@ function Сontainer_has_been_added() {    //Мультифункция на сл
 
 function Try_click_more_posts_button() {
     try {
-        More_posts_button_for_click.click()
+        document.getElementById("feed-new-message-inf-text-first").click()
     } catch (error) {
     }
 }

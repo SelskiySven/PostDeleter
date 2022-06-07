@@ -6,7 +6,7 @@
 //>>>Переменные<<<//
 let Deleted_posts_array = []    //Массив с id удаленных постов
 let Nums_of_non_loaded_post = []  //Массив с количсетвом неудачных попыток скрыть пост, он может быть неподжгружен
-let Minimum_number_of_posts = 5
+let Minimum_number_of_posts = 5 //Количество минимальных постов на странице
 let Posts_array = document.getElementsByClassName("feed-item-wrap")     //Cписок всех постов
 
 //>>>Константы<<<//
@@ -19,36 +19,7 @@ const Settings_path = Resources + "/settings.html"
 const FeedWrap = document.querySelectorAll(".feed-wrap")[1]   //Это основная стена, все посты являются детьми этого элемента
 const PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0]     //Это элемент над стеной с постами в нем содержится надмись "Новости", а данный аддон создает в нем меню с удаленными постами
 const More_posts_button = document.getElementById("feed-new-message-inf-wrap-first")  //Кнопка "Ещё события"
-
-let starts = setInterval(Load_new_posts_button, 100)
-
-//Функция для загрузки кнопки "Ещё события", для того чтобы нажать на нее в случае необходимости
-function Load_new_posts_button() {
-    let h = pageYOffset
-    let w = pageXOffset
-    if (More_posts_button != null) {   //Выполняем только если есть кнопка "Ещё события"
-        if (More_posts_button.offsetHeight == 0 & More_posts_button.offsetWidth == 0) {   //Значит кнопка уже нажата
-            clearInterval(starts)
-        } else {
-            if (More_posts_button.className == "feed-new-message-inf-wrap-first") {    //Иначе спускаемся в самый низ для активации скрипта сайта для загрузки этой кнопки
-                window.scroll(w, document.body.scrollHeight)
-            }
-            if (More_posts_button.className == "feed-new-message-inf-wrap-first feed-new-message-inf-wrap-first-visible feed-new-message-inf-wrap-first-active") {    //Кнопка подгрузилась значит возвращаемся в начало страницы и завершаем данную функцию
-                window.scroll(w, h)
-                Check_number_of_visible_posts()
-                try {
-                    clearInterval(starts)
-                } catch (error) {
-                }
-            }
-        }
-    } else {    //Если кнопки "Ещё события" нет, то и делать ничего не надо(дело в том, что в адресной строке может быть https://portal.unn.ru/stream/ , но мы по факту будем находится на странице авторизации)
-        try {
-            clearInterval(starts)
-        } catch (error) {
-        }
-    }
-}
+const More_posts_button_for_click = document.getElementById("feed-new-message-inf-text-first") // Для клика на кнопку "Ещё события"
 
 //Для обратной совместимости
 if (localStorage.getItem("DeletedPosts") != null) {    //Если в локальном хранилище есть такая переменная, значит аддон использовался до версии 3.5
@@ -92,7 +63,9 @@ function Delete_posts() {
         for (let i = 0; i < Deleted_posts_array.length; i++) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
                 if (document.getElementById(Deleted_posts_array[i]).parentNode.hidden == false) {  //Если данный элемент не скрыт, значит он загружен на страницу
+                    if (Nums_of_non_loaded_post[i]>0){
                     Nums_of_non_loaded_post[i]--
+                    }
                     localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
                 }
                 document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
@@ -438,14 +411,12 @@ function Add_more_posts() {
     if (document.getElementById("LIVEFEED_search").value == "") { //Если в поиске ничего не набрано
         let h = pageYOffset
         let w = pageXOffset
-        window.scroll(0, 0)
         setTimeout(() => {
             window.scroll(w, document.body.scrollHeight) //Опускаемся в самый низ
             setTimeout(() => {  //Через 100 милисекунд возвращаемся на предыдущую позицию
                 window.scroll(w, h)
             }, 100);
         }, 100);
-
     }
 }
 
@@ -467,7 +438,7 @@ Create_observers()
 function Create_observers_2() {
     try {
         const Observer_more_posts_button = new MutationObserver(Try_click_more_posts_button)
-        Observer_more_posts_button.observe(document.getElementById("feed-new-message-inf-wrap-first"), config = {
+        Observer_more_posts_button.observe(More_posts_button, config = {
             attributes: true
         })
     } catch (error) {
@@ -487,13 +458,12 @@ function Сontainer_has_been_added() {    //Мультифункция на сл
         Delete_posts()
         Create_deleter()
         Create_observers_2()
-        starts = setInterval(Load_new_posts_button, 100) //На случай, если выходим из поиска
     }, 10);
 }
 
 function Try_click_more_posts_button() {
     try {
-        document.getElementById("feed-new-message-inf-loader-first").click()
+        More_posts_button_for_click.click()
     } catch (error) {
     }
 }

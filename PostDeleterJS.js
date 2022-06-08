@@ -5,7 +5,8 @@
 
 //>>>Переменные<<<//
 let Deleted_posts_array = []    //Массив с id удаленных постов
-let Nums_of_non_loaded_post = []  //Массив с количсетвом неудачных попыток скрыть пост, он может быть неподжгружен
+let Nums_of_non_loaded_post = []  //Массив с количсетвом неудачных попыток скрыть пост, он может быть неподгружен
+let Nums_of_non_loaded_post_original = [] //Массив с количсетвом неудачных попыток скрыть пост из локального хранилища
 let Minimum_number_of_posts = 5 //Количество минимальных постов на странице
 let Posts_array = document.getElementsByClassName("feed-item-wrap")     //Cписок всех постов
 
@@ -36,6 +37,7 @@ if (localStorage.getItem("Nums_of_non_loaded_post") == null & localStorage.getIt
         Nums_of_non_loaded_post.push(0)
     }
     localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
+    Nums_of_non_loaded_post_original=Nums_of_non_loaded_post
 }
 
 //Загрузка данных из локального хранилища
@@ -45,9 +47,9 @@ function Get_data_from_localStorage() {
             Deleted_posts_array = localStorage.getItem("Deleted_posts_array").split(',')    //Помещаем id удаленных постов из локального хранилища в массив
             Nums_of_non_loaded_post = localStorage.getItem("Nums_of_non_loaded_post").split(',')    //Помещаем количество неудачных попыток скрыть посты в массив
             for (let i = 0; i < Nums_of_non_loaded_post.length; i++) {  //Делаем массив числовым
-                Nums_of_non_loaded_post[i] = parseInt(Nums_of_non_loaded_post[i]) + 1
+                Nums_of_non_loaded_post[i] = parseInt(Nums_of_non_loaded_post[i],10)
             }
-            localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)    //Загружаем его в localStorage
+            Nums_of_non_loaded_post_original=Nums_of_non_loaded_post.slice()
         }
         if (localStorage.getItem("Minimum_Number_Of_Posts") != null) {
             Minimum_number_of_posts = parseInt(localStorage.getItem("Minimum_Number_Of_Posts"), 10)
@@ -61,17 +63,14 @@ function Delete_posts() {
     if (Authorized()) {
         for (let i = 0; i < Deleted_posts_array.length; i++) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
-                if (document.getElementById(Deleted_posts_array[i]).parentNode.hidden == false) {  //Если данный элемент не скрыт, значит он загружен на страницу
-                    if (Nums_of_non_loaded_post[i] > 0) {
-                        Nums_of_non_loaded_post[i]--
-                    }
-                    localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
-                }
                 document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
+                Nums_of_non_loaded_post[i]=Nums_of_non_loaded_post_original[i]
                 Check_number_of_visible_posts()
             } catch (error) {
+                Nums_of_non_loaded_post[i]++
             }
         }
+        localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
     }
 }
 Delete_posts()
@@ -91,6 +90,7 @@ function Create_deleter() {
             Deleted_posts_array.push(this.parentNode.nextSibling.id)    //Добавляем в массив с удаленными постами id удаленого поста
             localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Обновляем список удаленных постов в локальном хранилище
             Nums_of_non_loaded_post.push(0)
+            Nums_of_non_loaded_post_original.push(0)
             localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)    //Обновляем массив с количеством не-загрузок поста
             Deleter.parentNode.parentNode.hidden = true    //Удаляем пост
             Create_menu_with_deleted_posts()  //Пересоздаем меню со списком удаленных постов

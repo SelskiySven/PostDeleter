@@ -7,6 +7,7 @@
     #PostDeleter_DivForMenus{
         display: flex;
         flex-direction: row;
+        padding: 10px 0;
     }
     .PostDeleter_SettingsItem{
         display: flex;
@@ -31,7 +32,14 @@
     #PostDeleter_SettingsBody{
         display: flex;
         flex-direction: column;
+    }
 
+    #PostDeleter_SettingsFooter{
+        width: 100%;;
+    }
+
+    #PostDeleter_SaveSettings{
+        margin: 10px;
     }
 
     /* Кнопка для открытия меню с удаленными постами и основного меню*/
@@ -97,10 +105,6 @@
     .PostDeleter_MainMenuItem:hover{
         transition: background-color .3s;
         background-color: rgb(231, 231, 231);
-    }
-
-    #PostDeleter_IndentDiv2{
-        height: 10px;
     }
 
     /* Полоска в главном меню для разделения элементов */

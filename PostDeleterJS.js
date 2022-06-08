@@ -37,7 +37,7 @@ if (localStorage.getItem("Nums_of_non_loaded_post") == null & localStorage.getIt
         Nums_of_non_loaded_post.push(0)
     }
     localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
-    Nums_of_non_loaded_post_original=Nums_of_non_loaded_post
+    Nums_of_non_loaded_post_original=Nums_of_non_loaded_post.slice()
 }
 
 //Загрузка данных из локального хранилища

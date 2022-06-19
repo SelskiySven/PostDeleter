@@ -17,7 +17,7 @@ const Manifest = chrome.runtime.getManifest()
 const About_path = Resources + "/about.html"
 const Settings_path = Resources + "/settings.html"
 
-const FeedWrap = document.querySelectorAll(".feed-wrap")[1]   //Это основная стена, все посты являются детьми этого элемента
+const FeedWrap = document.querySelectorAll(".feed-wrap")[1]   //Это основная стена, все посты(начальные) являются детьми этого элемента
 const PagetitleWrap = document.querySelectorAll(".pagetitle-wrap")[0]     //Это элемент над стеной с постами в нем содержится надпись "Новости", а данный аддон создает в нем меню с удаленными постами
 const More_posts_button = document.getElementById("feed-new-message-inf-wrap-first")  //Кнопка "Ещё события"
 
@@ -37,7 +37,7 @@ if (localStorage.getItem("Nums_of_non_loaded_post") == null & localStorage.getIt
         Nums_of_non_loaded_post.push(0)
     }
     localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
-    Nums_of_non_loaded_post_original=Nums_of_non_loaded_post.slice()
+    Nums_of_non_loaded_post_original = Nums_of_non_loaded_post.slice()
 }
 
 //Загрузка данных из локального хранилища
@@ -47,9 +47,9 @@ function Get_data_from_localStorage() {
             Deleted_posts_array = localStorage.getItem("Deleted_posts_array").split(',')    //Помещаем id удаленных постов из локального хранилища в массив
             Nums_of_non_loaded_post = localStorage.getItem("Nums_of_non_loaded_post").split(',')    //Помещаем количество неудачных попыток скрыть посты в массив
             for (let i = 0; i < Nums_of_non_loaded_post.length; i++) {  //Делаем массив числовым
-                Nums_of_non_loaded_post[i] = parseInt(Nums_of_non_loaded_post[i],10)
+                Nums_of_non_loaded_post[i] = parseInt(Nums_of_non_loaded_post[i], 10)
             }
-            Nums_of_non_loaded_post_original=Nums_of_non_loaded_post.slice()
+            Nums_of_non_loaded_post_original = Nums_of_non_loaded_post.slice()
         }
         if (localStorage.getItem("Minimum_Number_Of_Posts") != null) {
             Minimum_number_of_posts = parseInt(localStorage.getItem("Minimum_Number_Of_Posts"), 10)
@@ -64,10 +64,10 @@ function Delete_posts() {
         for (let i = 0; i < Deleted_posts_array.length; i++) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
                 document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
-                Nums_of_non_loaded_post[i]=Nums_of_non_loaded_post_original[i]
+                Nums_of_non_loaded_post[i] = Nums_of_non_loaded_post_original[i] + 0 //В случае если пост существует, то оставляем количество неудачных попыток удалить пост прежним
                 Check_number_of_visible_posts()
             } catch (error) {
-                Nums_of_non_loaded_post[i]++
+                Nums_of_non_loaded_post[i] = Nums_of_non_loaded_post_original[i] + 1 //Иначе прибавляем 1
             }
         }
         localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
@@ -136,7 +136,7 @@ function Create_main_menu() {
     About_PostDeleter.hidden = true
     document.body.append(Background_Fullscreen_PostDeleter, About_PostDeleter)
     let About_Posdeleter_body = document.createElement("div")
-    let Get_about = new XMLHttpRequest
+    let Get_about = new XMLHttpRequest //Справка получается через XMLHttpRequest из файла about.html в папке Resources
     Get_about.open("GET", About_path, true)
     Get_about.onload = function () {
         About_Posdeleter_body.innerHTML = Get_about.response
@@ -178,7 +178,7 @@ function Create_main_menu() {
     let Settings_body = document.createElement("div")
     Settings_body.id = "PostDeleter_SettingsBody"
     Settings_PostDeleter_window.append(Settings_body)
-    let Get_settings = new XMLHttpRequest
+    let Get_settings = new XMLHttpRequest //Настройки получаются через XMLHttpRequest из файла settings.html в папке Resources
     Get_settings.open("GET", Settings_path, true)
     Get_settings.onload = function () {
         Settings_body.innerHTML = Get_settings.response
@@ -224,7 +224,7 @@ function Create_main_menu() {
     Main_menu.hidden = true
     Main_menu_div.append(Main_menu)
 
-    let Settings_PostDeleter = document.createElement("div")
+    let Settings_PostDeleter = document.createElement("div") //Пункт меню, открывающий настройки
     Settings_PostDeleter.className = "PostDeleter_MainMenuItem"
     Settings_PostDeleter.innerText = "Настройки"
     Settings_PostDeleter.onclick = function () {
@@ -234,23 +234,24 @@ function Create_main_menu() {
     Main_menu.append(Settings_PostDeleter)
     Append_Strip(Main_menu)
 
-    let Remove_old_posts = document.createElement("div")
+    let Remove_old_posts = document.createElement("div") //Пункт меню, удаляющий старые данные
     Remove_old_posts.className = "PostDeleter_MainMenuItem"
     Remove_old_posts.innerText = "Удаление старых данных"
-    Remove_old_posts.onclick = function () {
+    Remove_old_posts.onclick = function () { //Если портал не пытался загрузить пост более 10 раз, то данные, о том что пост был удален стираются
         if (confirm("Вы хотите удалить данные о постах, которые портал не пытался загрузить 10 раз?")) {
             let Counter = 0
             for (let i = Nums_of_non_loaded_post.length - 1; i >= 0; i--) {
                 if (Nums_of_non_loaded_post[i] >= 10) {
                     Counter++
                     Nums_of_non_loaded_post.splice(i, 1)
+                    Nums_of_non_loaded_post_original.splice(i, 1)
                     Deleted_posts_array.splice(i, 1)
                 }
             }
             localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Обновляем список удаленных постов в локальном хранилище
             localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)    //Обновляем массив с количеством не-загрузок поста
             let pr
-            if (((toString(Counter)[0] == '1' & toString(Counter)[1] == '1') | Counter == 1)) {
+            if (((toString(Counter)[0] == '1' & toString(Counter)[1] == '1') | Counter == 1)) { //Вычисление правильного построения предложения(предлог о/об и окончание простЕ/постАХ)
                 pr = 'об'
             } else {
                 pr = 'о'
@@ -270,7 +271,7 @@ function Create_main_menu() {
     let Check_updates = document.createElement("div")   //Проверка обновлений расширения с Github
     Check_updates.className = "PostDeleter_MainMenuItem"
     Check_updates.innerText = "Проверка наличия обновлений"
-    Check_updates.onclick = function () {
+    Check_updates.onclick = function () { //Получение тега(там указана версия) последнего релиза PostDeleter с репозитория github через github api, если он не совпадает с текущим, значит вышла новая версия
         let Get_github_info = new XMLHttpRequest;
         let Github_info
         Get_github_info.open("GET", "https://api.github.com/repos/SelskiySven/PostDeleter/releases", true);
@@ -280,7 +281,7 @@ function Create_main_menu() {
                 alert("Вы используете поледнюю версию PostDeleter")
             } else {
                 if (confirm('Найдена новая версия, открыть страницу для скачивания?')) {
-                    window.open(Github_info[0].html_url)
+                    window.location.href = Github_info[0].html_url
                 }
             }
         }
@@ -299,6 +300,7 @@ function Create_main_menu() {
             localStorage.removeItem("Nums_of_non_loaded_post")
             localStorage.removeItem("Minimum_Number_Of_Posts")
             Nums_of_non_loaded_post = []
+            Nums_of_non_loaded_post_original = []
             Deleted_posts_array = []
             Create_menu_with_deleted_posts()
             alert("Данные успешно очищены")
@@ -387,6 +389,7 @@ function Create_menu_with_deleted_posts() {
             Deleted_posts_array.splice(i, 1)    //Удаляем его из списка удаленных постов
             localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Обновляем массив с id удаленных постов в локальном хранилище
             Nums_of_non_loaded_post.splice(i, 1)
+            Nums_of_non_loaded_post_original.splice(i, 1)
             localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)    //Обновляем массив с количеством не-загрузок поста
             this.parentNode.parentNode.remove() //Удаляем строку из меню
         }
@@ -410,25 +413,12 @@ function Check_number_of_visible_posts() {
 //Функция для загрузки новых постов
 function Add_more_posts() {
     if (document.getElementById("LIVEFEED_search").value == "") { //Если в поиске ничего не набрано
-        let h = pageYOffset
-        let w = pageXOffset
-        window.scroll(0, 0)
-        setTimeout(() => {
-            window.scroll(w, document.body.scrollHeight) //Опускаемся в самый низ
-            setTimeout(() => {  //Через 100 милисекунд возвращаемся на предыдущую позицию
-                window.scroll(w, h)
-            }, 100);
-        }, 100);
+        location.href = 'javascript:BX.Livefeed.PageInstance.getNextPage()'; //Вызов функции Bitrix для добавления новых сообщений 
     }
 }
 
 function Create_observers() {
     if (Authorized()) {
-        const Observer_posts = new MutationObserver(Post_has_been_added) //Наблюдатель за постами, необходим для того чтобы крестики появлялись на постах, появившихся в результаате нажатия на кнопку загруки новых сообщений 
-        Observer_posts.observe(FeedWrap, config = {
-            childList: true
-        })
-
         const Observer_containers = new MutationObserver(Сontainer_has_been_added)  //Наблюдатель за контейнерами, необходим для того чтобы крестики появлялись на постах, появившихся в результате подгрузки старых постов
         Observer_containers.observe(document.getElementById("log_internal_container"), config = {
             childList: true
@@ -440,9 +430,17 @@ Create_observers()
 function Create_observers_2() {
     if (Authorized()) {
         try {
-            const Observer_more_posts_button = new MutationObserver(Try_click_more_posts_button)
+            const Observer_more_posts_button = new MutationObserver(Try_click_more_posts_button) //Наблюдатель за кнопкой "Ещё события", пытается нажать на неё каждый раз, когда что-то меняется в её атрибутах, нужно для автоматического нажатия на нее
             Observer_more_posts_button.observe(document.getElementById("feed-new-message-inf-wrap-first"), config = {
                 attributes: true
+            })
+        } catch (error) {
+
+        }
+        try {
+            const Observer_posts = new MutationObserver(Create_deleter) //Наблюдатель за постами, необходим для того чтобы крестики появлялись на постах, появившихся в результаате нажатия на кнопку загруки новых сообщений 
+            Observer_posts.observe(FeedWrap, config = {
+                childList: true
             })
         } catch (error) {
 
@@ -450,12 +448,6 @@ function Create_observers_2() {
     }
 }
 Create_observers_2()
-
-function Post_has_been_added() {     //Мультифункция на случай добавления нового поста
-    setTimeout(() => {
-        Create_deleter()
-    }, 10);
-}
 
 function Сontainer_has_been_added() {    //Мультифункция на случай загрузки нового контейнера
     setTimeout(() => {
@@ -465,7 +457,7 @@ function Сontainer_has_been_added() {    //Мультифункция на сл
     }, 10);
 }
 
-function Try_click_more_posts_button() {
+function Try_click_more_posts_button() { //Функция пытается нажать на кнопку "Ещё события"
     try {
         document.getElementById("feed-new-message-inf-text-first").click()
     } catch (error) {

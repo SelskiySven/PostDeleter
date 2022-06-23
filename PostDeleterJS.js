@@ -9,6 +9,7 @@ let Nums_of_non_loaded_post = []  //Массив с количсетвом не�
 let Nums_of_non_loaded_post_original = [] //Массив с количсетвом неудачных попыток скрыть пост из локального хранилища
 let Minimum_number_of_posts = 5 //Количество минимальных постов на странице
 let Posts_array = document.getElementsByClassName("feed-item-wrap")     //Cписок всех постов
+let Animation_enabled = false //Анимации вкл/выкл
 
 //>>>Константы<<<//
 const Resources = chrome.runtime.getURL("Resources")
@@ -190,38 +191,51 @@ function Create_main_menu() {
     let Settings_footer = document.createElement("div")
     Settings_footer.id = "PostDeleter_SettingsFooter"
     let Save_settings = document.createElement("button")
+    let Settings_message = document.createElement("div")
     Save_settings.id = "PostDeleter_SaveSettings"
     Save_settings.innerText = "Сохранить"
     Save_settings.onclick = function () {
+        Settings_message.innerText = "Успешно сохранено"
+        HideAfter(Settings_message, 3000)
         Minimum_number_of_posts = document.getElementById("PostDeleter_MinimumNumberOfPosts").value
         localStorage.setItem("Minimum_Number_Of_Posts", Minimum_number_of_posts)
         Check_number_of_visible_posts()
     }
     Settings_footer.append(Save_settings)
+    Settings_footer.append(Settings_message)
     Settings_PostDeleter_window.append(Settings_footer)
     document.body.append(Settings_PostDeleter_window)
 
     let Main_menu_div = document.createElement("div")   //Создание контейнера для кнопки, открывающей меню, и самого меню
     Main_menu_div.id = "MainMenuDiv"
     document.getElementById("PostDeleter_DivForMenus").insertBefore(Main_menu_div, document.getElementById("PostDeleter_DivForMenus").firstChild)
+    let Main_menu = document.createElement("div")   //Само меню
 
     let Main_menu_button = document.createElement("button") //Создание кнопки для открытия основного меню
     Main_menu_button.id = "PostDeleter_MainMenuButton"
     Main_menu_button.innerText = "Меню"
+    if (Animation_enabled) {
+        Main_menu_button.className = "PostDeleter_MenuButtons"
+        Main_menu.className = "PostDeleter_Menus"
+    } else {
+        Main_menu_button.className = "PostDeleter_MenuButtonsWithoutAnimation"
+        Main_menu.hidden = true
+    }
     Main_menu_button.onclick = function () { //Функция для открытия меню
         Main_menu_button.classList.toggle("PostDeleter_WhenMenuOpen")
-        if (document.getElementById("PostDeleter_MainMenu").hidden == true) {
-            document.getElementById("PostDeleter_MainMenu").hidden = false
+        if (Animation_enabled) {
+            Main_menu.classList.toggle("PostDeleter_OpenMenu")
         } else {
-            document.getElementById("PostDeleter_MainMenu").hidden = true
+            if (Main_menu.hidden == true) {
+                Main_menu.hidden = false
+            } else {
+                Main_menu.hidden = true
+            }
         }
     }
     Main_menu_div.append(Main_menu_button)
 
-    let Main_menu = document.createElement("div")   //Само меню
     Main_menu.id = "PostDeleter_MainMenu"
-    Main_menu.className = "PostDeleterMenu"
-    Main_menu.hidden = true
     Main_menu_div.append(Main_menu)
 
     let Settings_PostDeleter = document.createElement("div") //Пункт меню, открывающий настройки
@@ -268,34 +282,12 @@ function Create_main_menu() {
     Main_menu.append(Remove_old_posts)
     Append_Strip(Main_menu)
 
-    let Check_updates = document.createElement("div")   //Проверка обновлений расширения с Github
-    Check_updates.className = "PostDeleter_MainMenuItem"
-    Check_updates.innerText = "Проверка наличия обновлений"
-    Check_updates.onclick = function () { //Получение тега(там указана версия) последнего релиза PostDeleter с репозитория github через github api, если он не совпадает с текущим, значит вышла новая версия
-        let Get_github_info = new XMLHttpRequest;
-        let Github_info
-        Get_github_info.open("GET", "https://api.github.com/repos/SelskiySven/PostDeleter/releases", true);
-        Get_github_info.onload = function () {
-            Github_info = JSON.parse(Get_github_info.response)
-            if (Manifest.version == Github_info[0].tag_name) {
-                alert("Вы используете поледнюю версию PostDeleter")
-            } else {
-                if (confirm('Найдена новая версия, открыть страницу для скачивания?')) {
-                    window.location.href = Github_info[0].html_url
-                }
-            }
-        }
-        Get_github_info.send(null)
-    }
-    Main_menu.append(Check_updates)
-    Append_Strip(Main_menu)
-
     let Clear_cache_div = document.createElement("div") //Очистка данных (если надо удалить аддон, то надо очистить данные в локальном хранилище)
     Clear_cache_div.className = "PostDeleter_MainMenuItem"
     Clear_cache_div.innerText = "Очистка данных"
     Clear_cache_div.id = "ClearCacheDiv"
     Clear_cache_div.onclick = function () { //Открытие меню с подтверждением действия
-        if (confirm("Вы действительно хотите очистить данные?")) {
+        if (confirm("Вы действительно хотите очистить данные PostDeleter?")) {
             localStorage.removeItem("Deleted_posts_array")
             localStorage.removeItem("Nums_of_non_loaded_post")
             localStorage.removeItem("Minimum_Number_Of_Posts")
@@ -341,24 +333,32 @@ function Create_menu_with_deleted_posts() {
     let Menu_deleted_posts_div = document.createElement("div")
     Menu_deleted_posts_div.id = "MenuDeletedPostsDiv"
     document.getElementById("PostDeleter_DivForMenus").append(Menu_deleted_posts_div)
-
+    let Deleted_posts_menu = document.createElement("div")    //Страница с меню
     let Menu_button_deleted_posts = document.createElement("button")    //Кнопка открывающая меню
     Menu_button_deleted_posts.innerText = "Удаленные посты"
     Menu_button_deleted_posts.id = "PostDeleter_DeletedPostsMenu"
+    if (Animation_enabled) {
+        Deleted_posts_menu.className = "PostDeleter_Menus"
+        Menu_button_deleted_posts.className = "PostDeleter_MenuButtons"
+    } else {
+        Menu_button_deleted_posts.className = "PostDeleter_MenuButtonsWithoutAnimation"
+        Deleted_posts_menu.hidden = true
+    }
     Menu_button_deleted_posts.onclick = function () { //Функция открывающая и закрывающая меню
         Menu_button_deleted_posts.classList.toggle("PostDeleter_WhenMenuOpen")
-        if (document.getElementById("PostDeleter_DropMenuDeletedPosts").hidden == true) {
-            document.getElementById("PostDeleter_DropMenuDeletedPosts").hidden = false
+        if (Animation_enabled) {
+            Deleted_posts_menu.classList.toggle("PostDeleter_OpenMenu")
         } else {
-            document.getElementById("PostDeleter_DropMenuDeletedPosts").hidden = true
+            if (Deleted_posts_menu.hidden == true) {
+                Deleted_posts_menu.hidden = false
+            } else {
+                Deleted_posts_menu.hidden = true
+            }
         }
     }
     Menu_deleted_posts_div.append(Menu_button_deleted_posts)
 
-    let Deleted_posts_menu = document.createElement("div")    //Страница с меню
     Deleted_posts_menu.id = "PostDeleter_DropMenuDeletedPosts"
-    Deleted_posts_menu.hidden = true
-    Deleted_posts_menu.className = "PostDeleterMenu"
     Menu_deleted_posts_div.append(Deleted_posts_menu)
     let Deleted_posts_table_div = document.createElement("div")
     Deleted_posts_table_div.id = "PostDeleter_DeletedPostsTableDiv"
@@ -470,4 +470,10 @@ function Authorized() { //Функция проверки, находимся л
     } else {
         return false
     }
+}
+
+function HideAfter(container, timeout) {
+    setTimeout(() => {
+        container.innerText = ""
+    }, timeout);
 }

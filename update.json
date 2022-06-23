@@ -3,6 +3,10 @@
         "{a170793d-f765-4dac-9b46-ee99ef78e38b}": {
             "updates": [
                 {
+                    "version": "3.7",
+                    "update_link": "https://github.com/SelskiySven/PostDeleter/releases/download/3.7/PostDeleter.xpi"
+                },
+                {
                     "version": "3.8",
                     "update_link": "https://github.com/SelskiySven/PostDeleter/releases/download/3.8/PostDeleter.xpi"
                 }

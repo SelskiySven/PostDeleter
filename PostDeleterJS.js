@@ -65,6 +65,12 @@ function Delete_posts() {
         for (let i = 0; i < Deleted_posts_array.length; i++) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
                 document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
+                if (Animation_enabled) {
+                    document.getElementById(Deleted_posts_array[i]).parentNode.classList.add("PostDeleter_DeletePost")
+                    setTimeout(() => {
+                        document.getElementById(Deleted_posts_array[i]).parentNode.hidden = false
+                    }, 1000);
+                }
                 Nums_of_non_loaded_post[i] = Nums_of_non_loaded_post_original[i] + 0 //В случае если пост существует, то оставляем количество неудачных попыток удалить пост прежним
                 Check_number_of_visible_posts()
             } catch (error) {
@@ -93,9 +99,13 @@ function Create_deleter() {
             Nums_of_non_loaded_post.push(0)
             Nums_of_non_loaded_post_original.push(0)
             localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)    //Обновляем массив с количеством не-загрузок поста
-            Deleter.parentNode.parentNode.hidden = true    //Удаляем пост
+            if (Animation_enabled) {
+                Deleter.parentNode.parentNode.classList.add("PostDeleter_DeletePost")
+            } else {
+                Deleter.parentNode.parentNode.hidden = true    //Удаляем пост
+            }
             Create_menu_with_deleted_posts()  //Пересоздаем меню со списком удаленных постов
-            Check_number_of_visible_posts() //Проверяем количество видимых постов, чтобы не получилась пустая страница
+            Check_number_of_visible_posts(true) //Проверяем количество видимых постов, чтобы не получилась пустая страница
         }
         let Deleter_image = document.createElement("div")   //Крестик для удаления поста
         Deleter_image.className = "PostDeleter_DeleterImage"
@@ -384,6 +394,7 @@ function Create_menu_with_deleted_posts() {
         Deleted_post_button.onclick = function () { //Функция нажатия на кнопку "Вернуть"
             try {
                 document.getElementById(Deleted_posts_array[i]).parentNode.hidden = false  //Делаем пост снова видимым
+                document.getElementById(Deleted_posts_array[i]).parentNode.classList.remove("PostDeleter_DeletePost")
             } catch (error) {
             }
             Deleted_posts_array.splice(i, 1)    //Удаляем его из списка удаленных постов
@@ -398,12 +409,15 @@ function Create_menu_with_deleted_posts() {
 }
 
 //Функция для подсчета количества отображаемых постов
-function Check_number_of_visible_posts() {
+function Check_number_of_visible_posts(ondelete = false) {
     let Number_of_visible_posts = Posts_array.length
     for (Post of Posts_array) {
         if (Post.offsetWidth == 0 || Post.offsetHeight == 0) {   //Считаем количество отображаемых постов
             Number_of_visible_posts--
         }
+    }
+    if (Animation_enabled & ondelete) {
+        Number_of_visible_posts--
     }
     if (Number_of_visible_posts < Minimum_number_of_posts) {   //Если отображаемых постов меньше 5, то зарпускаем триггер для загрузки дополнительных постов
         Add_more_posts()

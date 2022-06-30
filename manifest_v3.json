@@ -1,0 +1,24 @@
+{
+    "name": "PostDeleter",
+    "description" : "Post Deleter for portal.unn.ru",
+    "version": "4.0",
+    "manifest_version": 2,
+    "content_scripts": [
+        {
+          "matches": ["https://portal.unn.ru/stream/*"],
+          "js": ["PostDeleterJS.js"],
+          "css": ["PostDeleterStyles.css"]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+          "resources": [ "Resources/settings.html", "Resources/about.html" ],
+          "matches": [ "<all_urls>" ]
+        }],
+    "icons": {
+        "128": "icons/icon128.png",
+        "16": "icons/icon16.png",
+        "32": "icons/icon32.png",
+        "48": "icons/icon48.png"
+      }  
+}

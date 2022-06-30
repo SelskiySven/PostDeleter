@@ -202,6 +202,7 @@ function Create_main_menu(firstcreate = true) {
             } else {
                 Settings_PostDeleter_window.hidden = true
             }
+            document.getElementById("PostDeleter_SettingsMessage").innerText = ""
         }
         Settings_header.append(Close_settings_button)
         let Close_settings_image = document.createElement("div")
@@ -218,26 +219,29 @@ function Create_main_menu(firstcreate = true) {
             document.getElementById("PostDeleter_MinimumNumberOfPosts").value = Settings.Minimum_number_of_posts
             document.getElementById("PostDeleter_MinimumNumberOfPostsValue").innerText = Settings.Minimum_number_of_posts
             document.getElementById("PostDeleter_AnimationSettings").checked = Settings.Animation_enabled
+            document.getElementById("PostDeleter_ButtonSettings").checked = Settings.Button_enabled
         }
         Get_settings.send()
         let Settings_footer = document.createElement("div")
         Settings_footer.id = "PostDeleter_SettingsFooter"
         let Save_settings = document.createElement("button")
         let Settings_message = document.createElement("div")
+        Settings_message.id = "PostDeleter_SettingsMessage"
         Save_settings.id = "PostDeleter_SaveSettings"
         Save_settings.innerText = "Сохранить"
         Save_settings.onclick = function () {
             Settings.Minimum_number_of_posts = document.getElementById("PostDeleter_MinimumNumberOfPosts").value
             Check_number_of_visible_posts()
             Settings.Animation_enabled = document.getElementById("PostDeleter_AnimationSettings").checked
+            Settings.Button_enabled = document.getElementById("PostDeleter_ButtonSettings").checked
             localStorage.setItem("PostDeleterSettings", JSON.stringify(Settings))
             Change_animation()
             Create_menu_with_deleted_posts()
             Create_main_menu(false)
-            Settings_message.innerText = "Успешно сохранено"
+            Settings_message.innerText = ""
             setTimeout(() => {
-                Settings_message.innerText = ""
-            }, 3000);
+                Settings_message.innerText = "Успешно сохранено"
+            }, 100);
         }
         Settings_footer.append(Save_settings)
         Settings_footer.append(Settings_message)

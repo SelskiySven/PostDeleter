@@ -13,6 +13,10 @@
                 {
                     "version": "4.0",
                     "update_link": "https://github.com/SelskiySven/PostDeleter/releases/download/4.0/PostDeleter.xpi"
+                },
+                {
+                    "version": "4.1.1",
+                    "update_link": "https://github.com/SelskiySven/PostDeleter/releases/download/4.1.1/PostDeleter.xpi"
                 }
             ]
         }

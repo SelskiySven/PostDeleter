@@ -1,7 +1,7 @@
 {
     "name": "PostDeleter",
     "description" : "Post Deleter for portal.unn.ru",
-    "version": "4.0",
+    "version": "4.1.1",
     "developer": {
       "name": "SelskiySven"
    },

@@ -1,7 +1,7 @@
 {
     "name": "PostDeleter",
     "description" : "Post Deleter for portal.unn.ru",
-    "version": "4.0",
+    "version": "4.1.1",
     "manifest_version": 3,
     "content_scripts": [
         {
@@ -12,7 +12,7 @@
     ],
     "web_accessible_resources": [
         {
-          "resources": [ "Resources/settings.html", "Resources/about.html" ],
+          "resources": ["Resources/*"],
           "matches": [ "<all_urls>" ]
         }],
     "icons": {
@@ -20,5 +20,5 @@
         "16": "icons/icon16.png",
         "32": "icons/icon32.png",
         "48": "icons/icon48.png"
-      }  
+      }
 }

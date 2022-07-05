@@ -13,6 +13,11 @@ Settings.Button_enabled = false //Красивые кнопки вкл/выкл
 Settings.Animation_enabled = false //Анимации вкл/выкл
 Settings.Minimum_number_of_posts = 5 //Количество минимальных постов на странице
 
+let PostDeleter_Add_More_Posts_Button = document.createElement("div") //Способ загрузки новых сообщений в обход блокировки manifest v3
+PostDeleter_Add_More_Posts_Button.hidden = true
+PostDeleter_Add_More_Posts_Button.innerHTML = "<button onclick='BX.Livefeed.PageInstance.getNextPage()'></button>"
+document.body.append(PostDeleter_Add_More_Posts_Button)
+
 //>>>Константы<<<//
 const Resources = chrome.runtime.getURL("Resources")
 const Manifest = chrome.runtime.getManifest()
@@ -297,7 +302,12 @@ function Create_main_menu(firstcreate = true) {
             document.getElementById("PostDeleter_SettingsPostDeleter").hidden = false
         }
         document.getElementById("PostDeleter_BackgroundFullScreenPostDeleter").hidden = false
-        Main_menu_button.click()
+        Main_menu_button.classList.remove("PostDeleter_WhenMenuOpen")
+        if (Settings.Animation_enabled) {
+            Main_menu.classList.remove("PostDeleter_OpenMenu")
+        } else {
+            Main_menu.hidden = true
+        }
     }
     Main_menu.append(Settings_PostDeleter)
     Append_Strip(Main_menu)
@@ -365,7 +375,12 @@ function Create_main_menu(firstcreate = true) {
         } else {
             document.getElementById("PostDeleter_AboutPostDeleter").hidden = false
         }
-        Main_menu_button.click()
+        Main_menu_button.classList.remove("PostDeleter_WhenMenuOpen")
+        if (Settings.Animation_enabled) {
+            Main_menu.classList.remove("PostDeleter_OpenMenu")
+        } else {
+            Main_menu.hidden = true
+        }
     }
     Append_Strip(Main_menu)
     Main_menu.append(About_Div_Menu_item)
@@ -480,7 +495,10 @@ function Check_number_of_visible_posts(ondelete = false) {
 //Функция для загрузки новых постов
 function Add_more_posts() {
     if (document.getElementById("LIVEFEED_search").value == "") { //Если в поиске ничего не набрано
-        location.href = 'javascript:BX.Livefeed.PageInstance.getNextPage()'; //Вызов функции Bitrix для добавления новых сообщений 
+        // location.href = 'javascript:BX.Livefeed.PageInstance.getNextPage()'; //Вызов функции Bitrix для добавления новых сообщений 
+        // BX.Livefeed.PageInstance.getNextPage()
+        // eval("location.href = 'javascript:BX.Livefeed.PageInstance.getNextPage()'")
+        PostDeleter_Add_More_Posts_Button.firstChild.click()
     }
 }
 
@@ -526,7 +544,8 @@ function Сontainer_has_been_added() {    //Мультифункция на сл
 
 function Try_click_more_posts_button() { //Функция пытается нажать на кнопку "Ещё события"
     try {
-        document.getElementById("feed-new-message-inf-text-first").click()
+        document.getElementById("feed-new-message-inf-wrap-first").style.display = "none"
+        document.getElementById("feed-new-message-inf-wrap-first").parentNode.nextSibling.style.display = "block"
     } catch (error) {
     }
 }

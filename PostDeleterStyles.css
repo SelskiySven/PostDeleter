@@ -29,6 +29,8 @@
         width: 40px;
         height: 20px;
         appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
         outline: none;
         background-color: #c6c6c6;
         border-radius: 10px;
@@ -93,10 +95,11 @@
         font-weight: 700;
     }
 
-    #PostDeleter_SettingsBody {
+    /* #PostDeleter_SettingsBody {
         display: flex;
         flex-direction: column;
-    }
+        overflow-x: auto;
+    } */
 
     #PostDeleter_SettingsFooter {
         width: 100%;
@@ -230,9 +233,12 @@
     #PostDeleter_CloseSettingsButton {
         border: none;
         float: right;
-        padding: 5px;
+        margin: 1vh 1vh 0 0;
         background: inherit;
         cursor: pointer;
+        width: 2vw;
+        height: 2vw;
+        padding: 0;
     }
 
     /* id удаленного поста в выпадающем меню с удаленными постами */
@@ -253,6 +259,14 @@
         height: 2vw;
         background-color: #F69291;
         clip-path: polygon(15% 0, 0 15%, 35% 50%, 0 85%, 15% 100%, 50% 65%, 85% 100%, 100% 85%, 65% 50%, 100% 15%, 85% 0, 50% 35%);
+    }
+
+    #PostDeleter_CloseAboutImage,
+    #PostDeleter_CloseSettingsImage,
+    #PostDeleter_CloseAboutButton,
+    #PostDeleter_CloseSettingsButton  {
+        max-height: 4vh;
+        max-width: 4vh;
     }
 
     /* Затемнение при открытии справки */
@@ -305,12 +319,19 @@
     #PostDeleter_SettingsHeader {
         display: flex;
         justify-content: space-between;
+        align-items: flex-start;
+        height: 5vh;
     }
 
     #PostDeleter_AboutBody {
         width: 100%;
-        height: 90%;
+        height: 74vh;
         border: none;
+        overflow-y: auto;
+    }
+
+    .PostDeleter_Title{
+        font-size: min(4vh, 50px);
     }
 
     /* Настройки красивого скроллбара (не работает в firefox) */

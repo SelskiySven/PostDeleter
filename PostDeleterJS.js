@@ -47,10 +47,10 @@ if (localStorage.getItem("Nums_of_non_loaded_post") == null & localStorage.getIt
     localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
     Nums_of_non_loaded_post_original = Nums_of_non_loaded_post.slice()
 }
-if (localStorage.getItem("Minimum_Number_Of_Posts") != null){
+if (localStorage.getItem("Minimum_Number_Of_Posts") != null) {
     Settings.Minimum_number_of_posts = parseInt(localStorage.getItem("Minimum_Number_Of_Posts"))
     localStorage.removeItem("Minimum_Number_Of_Posts")
-    localStorage.setItem("PostDeleterSettings", '{"Minimum_number_of_posts":'+Settings.Minimum_number_of_posts+'}')
+    localStorage.setItem("PostDeleterSettings", '{"Minimum_number_of_posts":' + Settings.Minimum_number_of_posts + '}')
 }
 
 //Загрузка данных из локального хранилища
@@ -66,13 +66,13 @@ function Get_data_from_localStorage() {
         }
         if (localStorage.getItem("PostDeleterSettings") != null) {
             let LocalSettings = JSON.parse(localStorage.getItem("PostDeleterSettings"))
-            if (LocalSettings.Minimum_number_of_posts!= undefined){
+            if (LocalSettings.Minimum_number_of_posts != undefined) {
                 Settings.Minimum_number_of_posts = parseInt(LocalSettings.Minimum_number_of_posts)
             }
-            if (LocalSettings.Animation_enabled==true){
+            if (LocalSettings.Animation_enabled == true) {
                 Settings.Animation_enabled = true
             }
-            if (LocalSettings.Button_enabled==true){
+            if (LocalSettings.Button_enabled == true) {
                 Settings.Button_enabled = true
             }
         }
@@ -174,7 +174,7 @@ function Create_main_menu(firstcreate = true) {
         About_Posdeleter_body.id = "PostDeleter_AboutBody"
         let About_Postdeleter_header = document.createElement("div")
         About_Postdeleter_header.id = "PostDeleter_AboutHeader"
-        About_Postdeleter_header.innerHTML = "<h1>PostDeleter v" + Manifest.version + "</h1>"
+        About_Postdeleter_header.innerHTML = "<h1 class='PostDeleter_Title'>PostDeleter v" + Manifest.version + "</h1>"
         About_PostDeleter.append(About_Postdeleter_header, About_Posdeleter_body)
         let Close_about_button = document.createElement("button")
         Close_about_button.id = "PostDeleter_CloseAboutButton"
@@ -196,7 +196,7 @@ function Create_main_menu(firstcreate = true) {
         Settings_PostDeleter_window.hidden = true
         let Settings_header = document.createElement("div")
         Settings_header.id = "PostDeleter_SettingsHeader"
-        Settings_header.innerHTML = "<h1>Настройки</h1>"
+        Settings_header.innerHTML = "<h1 class='PostDeleter_Title'>Настройки</h1>"
         Settings_PostDeleter_window.append(Settings_header)
         let Close_settings_button = document.createElement("button")
         Close_settings_button.id = "PostDeleter_CloseSettingsButton"
@@ -409,7 +409,7 @@ function Create_menu_with_deleted_posts() {
     document.getElementById("PostDeleter_DivForMenus").append(Menu_deleted_posts_div)
     let Deleted_posts_menu = document.createElement("div")    //Страница с меню
     let Menu_button_deleted_posts = document.createElement("button")    //Кнопка открывающая меню
-    Menu_button_deleted_posts.innerText = "Удаленные посты"
+    Menu_button_deleted_posts.innerText = "Удалённые посты"
     Menu_button_deleted_posts.id = "PostDeleter_DeletedPostsMenu"
     if (Settings.Animation_enabled) {
         Deleted_posts_menu.className = "PostDeleter_Menus"
@@ -455,7 +455,7 @@ function Create_menu_with_deleted_posts() {
         Deleted_posts_row.append(Deleted_post_button)
         Deleted_post_button = document.createElement("button")  //Сама кнопка
         Deleted_post_button.className = "PostDeleter_ReturnButton"
-        if (Settings.Button_enabled){
+        if (Settings.Button_enabled) {
             Deleted_post_button.classList.add("PostDeleter_ReturnButtonPerfect")
         }
         Deleted_post_button.innerText = "Вернуть"
@@ -544,8 +544,10 @@ function Сontainer_has_been_added() {    //Мультифункция на сл
 
 function Try_click_more_posts_button() { //Функция пытается нажать на кнопку "Ещё события"
     try {
-        document.getElementById("feed-new-message-inf-wrap-first").style.display = "none"
-        document.getElementById("feed-new-message-inf-wrap-first").parentNode.nextSibling.style.display = "block"
+        if (document.getElementById("feed-new-message-inf-wrap-first").style.display != "none") {
+            document.getElementById("feed-new-message-inf-wrap-first").style.display = "none"
+            document.getElementById("feed-new-message-inf-wrap-first").parentNode.nextSibling.style.display = "block"
+        }
     } catch (error) {
     }
 }

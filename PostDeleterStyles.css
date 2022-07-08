@@ -1,5 +1,9 @@
+    .PostDeleter_Hidden{
+        display: none;
+    }
+    
     /* Контейнер для меню */
-    #PostDeleter_DivForMenus {
+    .PostDeleter_DivForMenusClass {
         display: flex;
         flex-direction: row;
         padding: 10px 0;
@@ -95,25 +99,18 @@
         font-weight: 700;
     }
 
-    /* #PostDeleter_SettingsBody {
-        display: flex;
-        flex-direction: column;
-        overflow-x: auto;
-    } */
-
-    #PostDeleter_SettingsFooter {
+    .PostDeleter_SettingsFooterClass {
         width: 100%;
         display: flex;
         align-items: center;
     }
 
-    #PostDeleter_SaveSettings {
+    .PostDeleter_SaveSettingsClass {
         margin: 10px;
     }
 
     /* Кнопки для открытия меню с удаленными постами и основного меню*/
-    #PostDeleter_DeletedPostsMenu,
-    #PostDeleter_MainMenuButton {
+    .PostDeleter_OpenMenuButtons {
         background-color: #3498DB;
         border: none;
         cursor: pointer;
@@ -143,7 +140,7 @@
     }
 
     /* Меню с удаленными постами */
-    #PostDeleter_DropMenuDeletedPosts {
+    .PostDeleter_DropMenuDeletedPostsClass {
         position: absolute;
         background-color: lightgray;
         z-index: 12;
@@ -154,7 +151,7 @@
     }
 
     /* Контейнер в меню с удаленными постами */
-    #PostDeleter_DeletedPostsTableDiv {
+    .PostDeleter_DeletedPostsTableDivClass {
         width: 200px;
         overflow-y: scroll;
         scrollbar-color: rgb(80, 163, 190) lightgray;
@@ -163,7 +160,7 @@
     }
 
     /* Основное меню */
-    #PostDeleter_MainMenu {
+    .PostDeleter_MainMenuClass {
         position: absolute;
         background-color: lightgray;
         z-index: 12;
@@ -178,20 +175,13 @@
         transition: opacity .2s .3s, max-height .5s;
     }
 
-    #PostDeleter_MainMenu.PostDeleter_OpenMenu {
+    .PostDeleter_Menus.PostDeleter_OpenMenu {
         opacity: 1;
         max-height: 50vh;
         transition: opacity .5s .1s, max-height .5s .1s;
     }
 
-    #PostDeleter_DropMenuDeletedPosts.PostDeleter_OpenMenu {
-        opacity: 1;
-        max-height: 50vh;
-        transition: opacity .5s .1s, max-height .5s .1s;
-    }
-
-    #PostDeleter_DeletedPostsMenu:hover,
-    #PostDeleter_MainMenuButton:hover {
+    .PostDeleter_OpenMenuButtons:hover {
         background-color: #2980B9;
     }
 
@@ -229,8 +219,7 @@
 
     /* Контейнер с картинкой крестика */
     .PostDeleter_PostDeleter,
-    #PostDeleter_CloseAboutButton,
-    #PostDeleter_CloseSettingsButton {
+    .PostDeleter_ClosePopup {
         border: none;
         float: right;
         margin: 1vh 1vh 0 0;
@@ -246,31 +235,23 @@
         margin: 0.5% 0;
     }
 
-    /* Контейнер для отступа кнопки открывающей меню с удаленными постами от самих постов */
-    #PostDeleter_IndentDiv {
-        margin: 1%;
-    }
-
     /* Крестик */
     .PostDeleter_DeleterImage,
-    #PostDeleter_CloseAboutImage,
-    #PostDeleter_CloseSettingsImage {
+    .PostDeleter_ClosePopupImage {
         width: 2vw;
         height: 2vw;
         background-color: #F69291;
         clip-path: polygon(15% 0, 0 15%, 35% 50%, 0 85%, 15% 100%, 50% 65%, 85% 100%, 100% 85%, 65% 50%, 100% 15%, 85% 0, 50% 35%);
     }
 
-    #PostDeleter_CloseAboutImage,
-    #PostDeleter_CloseSettingsImage,
-    #PostDeleter_CloseAboutButton,
-    #PostDeleter_CloseSettingsButton  {
+    .PostDeleter_ClosePopupImage,
+    .PostDeleter_ClosePopup  {
         max-height: 4vh;
         max-width: 4vh;
     }
 
     /* Затемнение при открытии справки */
-    #PostDeleter_BackgroundFullScreenPostDeleter {
+    .PostDeleter_BackgroundFullScreenPostDeleterClass {
         width: 100vw;
         height: 100vh;
         position: fixed;
@@ -281,8 +262,7 @@
     }
 
     /* Справка и настройки*/
-    #PostDeleter_AboutPostDeleter,
-    #PostDeleter_SettingsPostDeleter {
+    .PostDeleter_PopupsBasic {
         position: fixed;
         padding: 10px;
         height: 80vh;
@@ -315,15 +295,14 @@
     }
 
     /* Заголовки справки и настроек */
-    #PostDeleter_AboutHeader,
-    #PostDeleter_SettingsHeader {
+    .PostDeleter_PopupHeaders {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         height: 5vh;
     }
 
-    #PostDeleter_AboutBody {
+    .PostDeleter_AboutBodyClass {
         width: 100%;
         height: 74vh;
         border: none;
@@ -335,16 +314,16 @@
     }
 
     /* Настройки красивого скроллбара (не работает в firefox) */
-    #PostDeleter_DeletedPostsTableDiv::-webkit-scrollbar {
+    .PostDeleter_DeletedPostsTableDivClass::-webkit-scrollbar {
         background-color: lightgray;
         width: 10px;
     }
 
-    #PostDeleter_DeletedPostsTableDiv::-webkit-scrollbar-track {
+    .PostDeleter_DeletedPostsTableDivClass::-webkit-scrollbar-track {
         border-radius: 10px;
     }
 
-    #PostDeleter_DeletedPostsTableDiv::-webkit-scrollbar-thumb {
+    .PostDeleter_DeletedPostsTableDivClass::-webkit-scrollbar-thumb {
         border-radius: 10px;
         background: linear-gradient(180deg, #00c6fb, #005bea);
     }

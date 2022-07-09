@@ -120,22 +120,23 @@
         margin-right: 5px;
     }
 
+    /* Класс для заострения уголков кнопки меню с удаленными постами */
     .PostDeleter_MenuButtons {
         border-radius: 10px;
         transition: border-radius .5s .4s;
     }
 
-    /* Класс для заострения уголков кнопки меню с удаленными постами */
-    .PostDeleter_MenuButtons.PostDeleter_WhenMenuOpen {
-        border-radius: 10px 10px 0 0 !important;
-        transition: border-radius .2s;
-    }
 
     .PostDeleter_MenuButtonsWithoutAnimation {
         border-radius: 10px;
     }
 
-    .PostDeleter_MenuButtonsWithoutAnimation.PostDeleter_WhenMenuOpen {
+    .PostDeleter_WhenMenuOpen {
+        border-radius: 10px 10px 0 0 !important;
+        transition: border-radius .2s
+    }
+
+    .PostDeleter_WhenMenuOpenWithoutAnimation {
         border-radius: 10px 10px 0 0 !important;
     }
 

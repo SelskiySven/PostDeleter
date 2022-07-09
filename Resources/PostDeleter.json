@@ -1,0 +1,111 @@
+{
+    "settings": {
+        "theme": {
+            "classic": {
+                "checkboxes": {
+                    "Animation": "Анимации",
+                    "Beautiful_Buttons": "Красивые кнопки"
+                },
+                "Deleter_Div": "PostDeleter_PostDeleterDiv",
+                "Deleter_Button": "PostDeleter_PostDeleter",
+                "Deleter_Image": "PostDeleter_DeleterImage",
+                "Div_For_Menus": "PostDeleter_DivForMenusClass",
+                "Popup_Basic": "PostDeleter_PopupsBasic",
+                "Background_FullScreen": "PostDeleter_BackgroundFullScreenPostDeleterClass",
+                "Hidden": "PostDeleter_Hidden",
+                "About_Body": "PostDeleter_AboutBodyClass",
+                "Popup_Header": "PostDeleter_PopupHeaders",
+                "Close_Popup": "PostDeleter_ClosePopup",
+                "Deleted_Post": {
+                    "change": "Animation",
+                    "true": "PostDeleter_DeletePost",
+                    "false": "PostDeleter_Hidden"
+                },
+                "Popups": {
+                    "change": "Animation",
+                    "true": "PostDeleter_PopupsShow",
+                    "false": "PostDeleter_Hidden"
+                },
+                "Popups_Hidden": {
+                    "change": "Animation",
+                    "true": "PostDeleter_Popups",
+                    "false": "PostDeleter_Hidden"
+                },
+                "Close_Popup_Image": "PostDeleter_ClosePopupImage",
+                "Popup_Title": "PostDeleter_Title",
+                "Settings_Footer": "PostDeleter_SettingsFooterClass",
+                "Save_Button": "PostDeleter_SaveSettingsClass",
+                "Open_Menu_Buttons": "PostDeleter_OpenMenuButtons",
+                "Menus": {
+                    "change": "Animation",
+                    "true": "PostDeleter_Menus",
+                    "false": "PostDeleter_Hidden"
+                },
+                "Menu_Buttons": {
+                    "change": "Animation",
+                    "true": "PostDeleter_MenuButtons",
+                    "false": "PostDeleter_MenuButtonsWithoutAnimation"
+                },
+                "Open_Menu": {
+                    "change": "Animation",
+                    "true": "PostDeleter_OpenMenu",
+                    "false": "PostDeleter_Hidden"
+                },
+                "Button_When_Menu_Open": {
+                    "change": "Animation",
+                    "true": "PostDeleter_WhenMenuOpen",
+                    "false": "PostDeleter_WhenMenuOpenWithoutAnimation"
+                },
+                "Main_Menu": "PostDeleter_MainMenuClass",
+                "Main_Menu_Item": "PostDeleter_MainMenuItem",
+                "Strips": "PostDeleter_Strips",
+                "Menu_With_Deleted_Posts": "PostDeleter_DropMenuDeletedPostsClass",
+                "Div_For_Table_With_Deleted_Posts": "PostDeleter_DeletedPostsTableDivClass",
+                "Deleted_Post_Name": "PostDeleter_DeletedPostName",
+                "Return_Buttons": {
+                    "change": "Beautiful_Buttons",
+                    "true": "PostDeleter_ReturnButtonPerfect",
+                    "false": "PostDeleter_EmptyClass"
+                },
+                "SwitchClass": "PostDeleter_SettingsSwitch",
+                "CheckboxClass": "PostDeleter_SettingsSwitchCheckbox",
+                "Settings_Item_Description": "PostDeleter_SettingsItemDescription",
+                "Settings_Item": "PostDeleter_SettingsItem"
+            }
+        },
+        "language": {
+            "ru": {
+                "Main_Menu": "Меню",
+                "Deleted_Posts_Menu": "Удалённые посты",
+                "Return_Button": "Вернуть",
+                "Settings_Title": "Настройки",
+                "Settings": {
+                    "Title": "Настройки",
+                    "Minimum_Number_Of_Posts": "Минимальное количество постов на странице",
+                    "Animation": "Анимации",
+                    "Beautiful_Buttons": "Красивые кнопки",
+                    "Save_Button": "Сохранить"
+                },
+                "Clear_Old_Cache": "Удаление старых данных",
+                "Clear_Cache": "Очистка данных",
+                "About_Title": "Справка",
+                "About": {
+                    "Title": "Справка",
+                    "Clear_Old_Cache": "Удаление старых данных",
+                    "Clear_Old_Cache_Description": "Портал подгружает посты пачками, если портал не пытался загрузить удаленный пост 10 раз, то эта опция удалит его из списка удаленных постов",
+                    "Clear_Cache": "Очистка данных",
+                    "Clear_Cache_Description": "Postdeleter сохраняет данные в localStorage(локальное хранилище) вашего браузера, так что если вы собрались удалить Postdeleter, то перед этим настоятельно рекомендуется воспользоваться данной опцией",
+                    "Minimum_Number_Of_Posts": "Минимальное количество постов на странице",
+                    "Minimum_Number_Of_Posts_Description": "Минимально возможное количество постов на странице",
+                    "Animation": "Анимации",
+                    "Animation_Description": "Вкл/Выкл анимаций открытия/закрытия меню, окон справки и настроек, а также удаления/возврата постов",
+                    "Beautiful_Buttons": "Красивые кнопки",
+                    "Beautiful_Buttons_Description": "Вкл/Выкл красивые кнопки для возврата постов",
+                    "Repository": "Репозиторий Postdeleter на Github",
+                    "Support": "Поддержка",
+                    "Support_Description": "Если вы обнаружили ошибку / у вас есть пожелания или предложения, то пишите на почту: mark.al.knyazev@gmail.com"
+                }
+            }
+        }
+    }
+}

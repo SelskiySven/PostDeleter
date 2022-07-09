@@ -9,6 +9,7 @@ let Nums_of_non_loaded_post = []  //Массив с количеcтвом неу
 let Nums_of_non_loaded_post_original = [] //Массив с количсетвом неудачных попыток скрыть пост из локального хранилища
 let Posts_array = document.getElementsByClassName("feed-item-wrap")     //Cписок всех постов
 let Settings = {}
+let LastTheme = undefined
 
 let PostDeleter_Add_More_Posts_Button = document.createElement("div") //Способ загрузки новых сообщений в обход блокировки manifest v3
 PostDeleter_Add_More_Posts_Button.hidden = true
@@ -66,11 +67,11 @@ if (JSON.parse(localStorage.getItem("PostDeleterSettings")).Animation_enabled !=
     if (oldSettings.Minimum_number_of_posts != undefined) {
         NewSettings.Minimum_number_of_posts = oldSettings.Minimum_number_of_posts
     }
-    // localStorage.setItem("PostDeleterSettings",JSON.stringify(NewSettings))
+    localStorage.setItem("PostDeleterSettings", JSON.stringify(NewSettings))
 }
 
 //Загрузка данных из локального хранилища
-function Get_data_from_localStorage() {
+function Get_data() {
     if (Authorized()) {
         if (localStorage.getItem("Deleted_posts_array") != null & localStorage.getItem("Deleted_posts_array") != "") {
             Deleted_posts_array = localStorage.getItem("Deleted_posts_array").split(',')    //Помещаем id удаленных постов из локального хранилища в массив
@@ -96,24 +97,24 @@ function Get_data_from_localStorage() {
             DataBase = getDB.response
             Create_deleter()
             Create_div_for_menus()
+            Delete_posts()
         }
         getDB.send()
     }
 }
-Get_data_from_localStorage()
+Get_data()
 
 //Удаление постов
 function Delete_posts() {
     if (Authorized()) {
         for (let i = 0; i < Deleted_posts_array.length; i++) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
-                document.getElementById(Deleted_posts_array[i]).parentNode.classList.add("PostDeleter_Hidden")
-                if (Settings.Animation_enabled) {
-                    document.getElementById(Deleted_posts_array[i]).parentNode.classList.add("PostDeleter_DeletePost")
-                    setTimeout(() => {
-                        document.getElementById(Deleted_posts_array[i]).parentNode.classList.remove("PostDeleter_Hidden")
-                    }, 1000);
-                }
+                document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
+                ClassHelper(document.getElementById(Deleted_posts_array[i]).parentNode, "remove", "Deleted_Post", LastTheme)
+                ClassHelper(document.getElementById(Deleted_posts_array[i]).parentNode, "add", "Deleted_Post")
+                setTimeout(() => {
+                    document.getElementById(Deleted_posts_array[i]).parentNode.hidden = false
+                }, 1000);
                 Nums_of_non_loaded_post[i] = Nums_of_non_loaded_post_original[i] + 0 //В случае если пост существует, то оставляем количество неудачных попыток удалить пост прежним
                 Check_number_of_visible_posts()
             } catch (error) {
@@ -123,7 +124,6 @@ function Delete_posts() {
         localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)
     }
 }
-Delete_posts()
 
 //Создание крестиков
 function Create_deleter() {
@@ -133,26 +133,21 @@ function Create_deleter() {
     }
     for (Posts_array_item of Posts_array) {      // Перебираем все посты
         let Deleter_div = document.createElement("div")  //Создаем контейнер для крестика
-        Deleter_div.classList.add("PostDeleter_PostDeleterDiv")
+        ClassHelper(Deleter_div, "add", "Deleter_Div")
         let Deleter = document.createElement("button") //Создаем кнопку
-        Deleter.classList.add("PostDeleter_PostDeleter")
-        // ClassHelper(Deleter, "add", "Deleter_Button")
+        ClassHelper(Deleter, "add", "Deleter_Button")
         Deleter.onclick = function () {     //Функция нажатия на крестик
             Deleted_posts_array.push(this.parentNode.nextSibling.id)    //Добавляем в массив с удаленными постами id удаленого поста
             localStorage.setItem("Deleted_posts_array", Deleted_posts_array) //Обновляем список удаленных постов в локальном хранилище
             Nums_of_non_loaded_post.push(0)
             Nums_of_non_loaded_post_original.push(0)
             localStorage.setItem("Nums_of_non_loaded_post", Nums_of_non_loaded_post)    //Обновляем массив с количеством не-загрузок поста
-            if (Settings.Animation_enabled) {
-                Deleter.parentNode.parentNode.classList.add("PostDeleter_DeletePost")
-            } else {
-                Deleter.parentNode.parentNode.classList.add("PostDeleter_Hidden")    //Удаляем пост
-            }
+            ClassHelper(Deleter.parentNode.parentNode, "add", "Deleted_Post")
             Create_menu_with_deleted_posts()  //Пересоздаем меню со списком удаленных постов
             Check_number_of_visible_posts(true) //Проверяем количество видимых постов, чтобы не получилась пустая страница
         }
         let Deleter_image = document.createElement("div")   //Крестик для удаления поста
-        Deleter_image.classList.add("PostDeleter_DeleterImage")
+        ClassHelper(Deleter_image, "add", "Deleter_Image")
         Posts_array_item.insertBefore(Deleter_div, Posts_array_item.firstChild)
         Deleter_div.append(Deleter)
         Deleter.append(Deleter_image)
@@ -169,7 +164,7 @@ function Create_div_for_menus() {
         }
         let Div_for_menus = document.createElement("div")
         Div_for_menus.id = "PostDeleter_DivForMenus"
-        Div_for_menus.classList.add("PostDeleter_DivForMenusClass")
+        ClassHelper(Div_for_menus, "add", "Div_For_Menus")
         PagetitleWrap.append(Div_for_menus)
         Create_main_menu()
         Create_menu_with_deleted_posts()
@@ -178,123 +173,154 @@ function Create_div_for_menus() {
 
 
 //Функция для создания главного меню
-function Create_main_menu(firstcreate = true) {
+function Create_main_menu() {
     try {   //Пытаемся удалить кнопку открывающую меню и само меню, т.к. иногда нужно пересоздавать меню
         document.getElementById("MainMenuDiv").remove()
+        document.getElementById("PostDeleter_BackgroundFullScreenPostDeleter").remove()
+        document.getElementById("PostDeleter_AboutPostDeleter").remove()
+        document.getElementById("PostDeleter_SettingsPostDeleter").remove()
     } catch (error) {
     }
-
-    if (firstcreate) {
-        let About_PostDeleter = document.createElement("div") //Создание справки
-        let Background_Fullscreen_PostDeleter = document.createElement("div")
-        About_PostDeleter.id = "PostDeleter_AboutPostDeleter"
-        if (Settings.Animation_enabled) {
-            About_PostDeleter.classList.add("PostDeleter_Popups")
-        } else {
-            About_PostDeleter.classList.add("PostDeleter_Hidden")
-        }
-        About_PostDeleter.classList.add("PostDeleter_PopupsBasic")
-        Background_Fullscreen_PostDeleter.id = "PostDeleter_BackgroundFullScreenPostDeleter"
-        Background_Fullscreen_PostDeleter.classList.add("PostDeleter_BackgroundFullScreenPostDeleterClass")
-        Background_Fullscreen_PostDeleter.classList.add("PostDeleter_Hidden")
-        document.body.append(Background_Fullscreen_PostDeleter, About_PostDeleter)
-        let About_Posdeleter_body = document.createElement("div")
-        let Get_about = new XMLHttpRequest //Справка получается через XMLHttpRequest из файла about.html в папке Resources
-        Get_about.open("GET", About_path, true)
-        Get_about.onload = function () {
-            About_Posdeleter_body.innerHTML = Get_about.response
-        }
-        Get_about.send()
-        About_Posdeleter_body.id = "PostDeleter_AboutBody"
-        About_Posdeleter_body.classList.add("PostDeleter_AboutBodyClass")
-        let About_Postdeleter_header = document.createElement("div")
-        About_Postdeleter_header.id = "PostDeleter_AboutHeader"
-        About_Postdeleter_header.classList.add("PostDeleter_PopupHeaders")
-        About_Postdeleter_header.innerHTML = "<h1 class='PostDeleter_Title'>PostDeleter v" + Manifest.version + "</h1>"
-        About_PostDeleter.append(About_Postdeleter_header, About_Posdeleter_body)
-        let Close_about_button = document.createElement("button")
-        Close_about_button.classList.add("PostDeleter_ClosePopup")
-        Close_about_button.onclick = function () {
-            Background_Fullscreen_PostDeleter.classList.add("PostDeleter_Hidden")
-            if (Settings.Animation_enabled) {
-                About_PostDeleter.classList.toggle("PostDeleter_PopupsShow")
-            } else {
-                About_PostDeleter.classList.toggle("PostDeleter_Hidden")
-            }
-        }
-        About_Postdeleter_header.append(Close_about_button)
-        let Close_about_image = document.createElement("div")
-        Close_about_image.classList.add("PostDeleter_ClosePopupImage")
-        Close_about_button.append(Close_about_image)
-
-        let Settings_PostDeleter_window = document.createElement("div")    //Создание окна настроек
-        Settings_PostDeleter_window.id = "PostDeleter_SettingsPostDeleter"
-        if (Settings.Animation_enabled) {
-            Settings_PostDeleter_window.classList.add("PostDeleter_Popups")
-        } else {
-            Settings_PostDeleter_window.classList.add("PostDeleter_Hidden")
-        }
-        Settings_PostDeleter_window.classList.add("PostDeleter_PopupsBasic")
-        let Settings_header = document.createElement("div")
-        Settings_header.id = "PostDeleter_SettingsHeader"
-        Settings_header.classList.add("PostDeleter_PopupHeaders")
-        Settings_header.innerHTML = "<h1 class='PostDeleter_Title'>Настройки</h1>"
-        Settings_PostDeleter_window.append(Settings_header)
-        let Close_settings_button = document.createElement("button")
-        Close_settings_button.classList.add("PostDeleter_ClosePopup")
-        Close_settings_button.onclick = function () {
-            Background_Fullscreen_PostDeleter.classList.add("PostDeleter_Hidden")
-            if (Settings.Animation_enabled) {
-                Settings_PostDeleter_window.classList.toggle("PostDeleter_PopupsShow")
-            } else {
-                Settings_PostDeleter_window.classList.toggle("PostDeleter_Hidden")
-            }
-            document.getElementById("PostDeleter_SettingsMessage").innerText = ""
-        }
-        Settings_header.append(Close_settings_button)
-        let Close_settings_image = document.createElement("div")
-        Close_settings_image.classList.add("PostDeleter_ClosePopupImage")
-        Close_settings_button.append(Close_settings_image)
-        let Settings_body = document.createElement("div")
-        Settings_body.id = "PostDeleter_SettingsBody"
-        Settings_PostDeleter_window.append(Settings_body)
-        let Get_settings = new XMLHttpRequest //Настройки получаются через XMLHttpRequest из файла settings.html в папке Resources
-        Get_settings.open("GET", Settings_path, true)
-        Get_settings.onload = function () {
-            Settings_body.innerHTML = Get_settings.response
-            //Настройка настроек
-            document.getElementById("PostDeleter_MinimumNumberOfPosts").value = Settings.Minimum_number_of_posts
-            document.getElementById("PostDeleter_MinimumNumberOfPostsValue").innerText = Settings.Minimum_number_of_posts
-            document.getElementById("PostDeleter_AnimationSettings").checked = Settings.Animation_enabled
-            document.getElementById("PostDeleter_ButtonSettings").checked = Settings.Button_enabled
-        }
-        Get_settings.send()
-        let Settings_footer = document.createElement("div")
-        Settings_footer.classList.add("PostDeleter_SettingsFooterClass")
-        let Save_settings = document.createElement("button")
-        let Settings_message = document.createElement("div")
-        Settings_message.id = "PostDeleter_SettingsMessage"
-        Save_settings.classList.add("PostDeleter_SaveSettingsClass")
-        Save_settings.innerText = "Сохранить"
-        Save_settings.onclick = function () {
-            Settings.Minimum_number_of_posts = parseInt(document.getElementById("PostDeleter_MinimumNumberOfPosts").value)
-            Check_number_of_visible_posts()
-            Settings.Animation_enabled = document.getElementById("PostDeleter_AnimationSettings").checked
-            Settings.Button_enabled = document.getElementById("PostDeleter_ButtonSettings").checked
-            localStorage.setItem("PostDeleterSettings", JSON.stringify(Settings))
-            Change_animation()
-            Create_menu_with_deleted_posts()
-            Create_main_menu(false)
-            Settings_message.innerText = ""
-            setTimeout(() => {
-                Settings_message.innerText = "Успешно сохранено"
-            }, 100);
-        }
-        Settings_footer.append(Save_settings)
-        Settings_footer.append(Settings_message)
-        Settings_PostDeleter_window.append(Settings_footer)
-        document.body.append(Settings_PostDeleter_window)
+    let About_PostDeleter = document.createElement("div") //Создание справки
+    let Background_Fullscreen_PostDeleter = document.createElement("div")
+    About_PostDeleter.id = "PostDeleter_AboutPostDeleter"
+    ClassHelper(About_PostDeleter, "add", "Popups_Hidden")
+    ClassHelper(About_PostDeleter, "add", "Popup_Basic")
+    Background_Fullscreen_PostDeleter.id = "PostDeleter_BackgroundFullScreenPostDeleter"
+    ClassHelper(Background_Fullscreen_PostDeleter, "add", "Hidden")
+    ClassHelper(Background_Fullscreen_PostDeleter, "add", "Background_FullScreen")
+    document.body.append(Background_Fullscreen_PostDeleter, About_PostDeleter)
+    let About_Posdeleter_body = document.createElement("div")
+    let Get_about = new XMLHttpRequest //Справка получается через XMLHttpRequest из файла about.html в папке Resources
+    Get_about.open("GET", About_path, true)
+    Get_about.onload = function () {
+        About_Posdeleter_body.innerHTML = Get_about.response
     }
+    Get_about.send()
+    About_Posdeleter_body.id = "PostDeleter_AboutBody"
+    ClassHelper(About_Posdeleter_body, "add", "About_Body")
+    let About_Postdeleter_header = document.createElement("div")
+    About_Postdeleter_header.id = "PostDeleter_AboutHeader"
+    ClassHelper(About_Postdeleter_header, "add", "Popup_Header")
+    About_Postdeleter_header.innerHTML = "<h1 class='PostDeleter_Title'>PostDeleter v" + Manifest.version + "</h1>"
+    About_PostDeleter.append(About_Postdeleter_header, About_Posdeleter_body)
+    let Close_about_button = document.createElement("button")
+    ClassHelper(Close_about_button, "add", "Close_Popup")
+    Close_about_button.onclick = function () {
+        ClassHelper(Background_Fullscreen_PostDeleter, "add", "Hidden")
+        ClassHelper(About_PostDeleter, "toggle", "Popups")
+    }
+    About_Postdeleter_header.append(Close_about_button)
+    let Close_about_image = document.createElement("div")
+    ClassHelper(Close_about_image, "add", "Close_Popup_Image")
+    Close_about_button.append(Close_about_image)
+
+    let Settings_PostDeleter_window = document.createElement("div")    //Создание окна настроек
+    Settings_PostDeleter_window.id = "PostDeleter_SettingsPostDeleter"
+    ClassHelper(Settings_PostDeleter_window, "add", "Popups_Hidden")
+    ClassHelper(Settings_PostDeleter_window, "add", "Popup_Basic")
+    let Settings_header = document.createElement("div")
+    Settings_header.id = "PostDeleter_SettingsHeader"
+    ClassHelper(Settings_header, "add", "Popup_Header")
+    Settings_header.innerHTML = "<h1>Настройки</h1>"
+    ClassHelper(Settings_header.firstChild, "add", "Popup_Title")
+    Settings_PostDeleter_window.append(Settings_header)
+    let Close_settings_button = document.createElement("button")
+    ClassHelper(Close_settings_button, "add", "Close_Popup")
+    Close_settings_button.onclick = function () {
+        ClassHelper(Background_Fullscreen_PostDeleter, "add", "Hidden")
+        ClassHelper(Settings_PostDeleter_window, "toggle", "Popups")
+        document.getElementById("PostDeleter_SettingsMessage").innerText = ""
+    }
+    Settings_header.append(Close_settings_button)
+    let Close_settings_image = document.createElement("div")
+    ClassHelper(Close_settings_image, "add", "Close_Popup_Image")
+    Close_settings_button.append(Close_settings_image)
+    let Settings_body = document.createElement("div")
+    Settings_body.id = "PostDeleter_SettingsBody"
+    Settings_PostDeleter_window.append(Settings_body)
+    let Get_settings = new XMLHttpRequest //Настройки получаются через XMLHttpRequest из файла settings.html в папке Resources
+    Get_settings.open("GET", Settings_path, true)
+    Get_settings.onload = function () {
+        Settings_body.innerHTML = Get_settings.response
+        //Настройка настроек
+        document.getElementById("PostDeleter_MinimumNumberOfPosts").value = Settings.Minimum_number_of_posts
+        let Select_theme = document.createElement("select")
+        Select_theme.id = "PostDeleter_SelectTheme"
+        for (key in DataBase.settings.theme) {
+            let option = new Option(DataBase.settings.theme[key].Title, key)
+            if (Settings.theme == key) {
+                option.selected = true
+            }
+            Select_theme.options[Select_theme.options.length] = option
+        }
+        let Select_theme_div = document.createElement("div")
+        Select_theme.onchange = Create_Theme_Settings
+        ClassHelper(Select_theme_div, "add", "Settings_Item")
+        Select_theme_div.append(Select_theme)
+        document.getElementById("PostDeleter_ThemeSelect").append(Select_theme_div)
+
+        function Create_Theme_Settings() {
+            document.getElementById("PostDeleter_ThemeSettings").innerHTML = ""
+            for (key in DataBase.settings.theme[Select_theme.value].checkboxes) {
+                let CheckBox_div = document.createElement("div")
+                ClassHelper(CheckBox_div, "add", "SwitchClass", Select_theme.value)
+                let CheckBox = document.createElement("input")
+                CheckBox.type = "checkbox"
+                ClassHelper(CheckBox, "add", "CheckboxClass", Select_theme.value)
+                CheckBox.id = "PostDeleter_" + Select_theme.value + key
+                if (Settings[Select_theme.value + "Settings"] != undefined) {
+                    CheckBox.checked = Settings[Select_theme.value + "Settings"][key]
+                }
+                CheckBox_div.append(CheckBox)
+                let CheckBox_title = document.createElement("div")
+                CheckBox_title.innerText = DataBase.settings.theme[Select_theme.value].checkboxes[key]
+                ClassHelper(CheckBox_title, "add", "Settings_Item_Description")
+                let Settings_checkbox_item = document.createElement("div")
+                ClassHelper(Settings_checkbox_item, "add", "Settings_Item")
+                Settings_checkbox_item.append(CheckBox_div)
+                document.getElementById("PostDeleter_ThemeSettings").append(CheckBox_title, Settings_checkbox_item)
+                Append_Strip(document.getElementById("PostDeleter_ThemeSettings"))
+            }
+        }
+        Create_Theme_Settings()
+    }
+    Get_settings.send()
+    let Settings_footer = document.createElement("div")
+    ClassHelper(Settings_footer, "add", "Settings_Footer")
+    let Save_settings = document.createElement("button")
+    let Settings_message = document.createElement("div")
+    Settings_message.id = "PostDeleter_SettingsMessage"
+    ClassHelper(Save_settings, "add", "Save_Button")
+    Save_settings.innerText = "Сохранить"
+    Save_settings.onclick = function () {
+        Settings.Minimum_number_of_posts = parseInt(document.getElementById("PostDeleter_MinimumNumberOfPosts").value)
+        Check_number_of_visible_posts()
+        LastTheme = Settings.theme + ""
+        Settings.theme = document.getElementById("PostDeleter_SelectTheme").value
+        if (Settings[Settings.theme + "Settings"]==undefined){
+            Settings[Settings.theme + "Settings"]={}
+        }
+        for (key in DataBase.settings.theme[Settings.theme].checkboxes) {
+            Settings[Settings.theme + "Settings"][key] = document.getElementById("PostDeleter_" + Settings.theme + key).checked
+        }
+        localStorage.setItem("PostDeleterSettings", JSON.stringify(Settings))
+        if (LastTheme != Settings.theme) {
+            Create_main_menu()
+        }
+        Create_deleter()
+        Delete_posts()
+        Create_menu_with_deleted_posts()
+        Settings_message.innerText = ""
+        setTimeout(() => {
+            Settings_message.innerText = "Успешно сохранено"
+        }, 100);
+    }
+    Settings_footer.append(Save_settings)
+    Settings_footer.append(Settings_message)
+    Settings_PostDeleter_window.append(Settings_footer)
+    document.body.append(Settings_PostDeleter_window)
+
 
     let Main_menu_div = document.createElement("div")   //Создание контейнера для кнопки, открывающей меню, и самого меню
     Main_menu_div.id = "MainMenuDiv"
@@ -303,46 +329,32 @@ function Create_main_menu(firstcreate = true) {
 
     let Main_menu_button = document.createElement("button") //Создание кнопки для открытия основного меню
     Main_menu_button.id = "PostDeleter_MainMenuButton"
-    Main_menu_button.classList.add("PostDeleter_OpenMenuButtons")
+    ClassHelper(Main_menu_button, "add", "Open_Menu_Buttons")
     Main_menu_button.innerText = "Меню"
-    if (Settings.Animation_enabled) {
-        Main_menu_button.classList.add("PostDeleter_MenuButtons")
-        Main_menu.classList.add("PostDeleter_Menus")
-    } else {
-        Main_menu_button.classList.add("PostDeleter_MenuButtonsWithoutAnimation")
-        Main_menu.classList.add("PostDeleter_Hidden")
-    }
+    ClassHelper(Main_menu, "add", "Menus")
+    ClassHelper(Main_menu_button, "add", "Menu_Buttons")
     Main_menu_button.onclick = function () { //Функция для открытия меню
-        if (Settings.Animation_enabled) {
-            Main_menu.classList.toggle("PostDeleter_OpenMenu")
-            Main_menu_button.classList.toggle("PostDeleter_WhenMenuOpen")
-        } else {
-            Main_menu.classList.toggle("PostDeleter_Hidden")
-            Main_menu_button.classList.toggle("PostDeleter_WhenMenuOpenWithoutAnimation")
-        }
+        ClassHelper(Main_menu, "toggle", "Open_Menu")
+        ClassHelper(Main_menu_button, "toggle", "Button_When_Menu_Open")
     }
     Main_menu_div.append(Main_menu_button)
 
     Main_menu.id = "PostDeleter_MainMenu"
-    Main_menu.classList.add("PostDeleter_MainMenuClass")
+    ClassHelper(Main_menu, "add", "Main_Menu")
     Main_menu_div.append(Main_menu)
 
     let Settings_PostDeleter = document.createElement("div") //Пункт меню, открывающий настройки
-    Settings_PostDeleter.classList.add("PostDeleter_MainMenuItem")
+    ClassHelper(Settings_PostDeleter, "add", "Main_Menu_Item")
     Settings_PostDeleter.innerText = "Настройки"
     Settings_PostDeleter.onclick = function () {
-        if (Settings.Animation_enabled) {
-            document.getElementById("PostDeleter_SettingsPostDeleter").classList.add("PostDeleter_PopupsShow")
-        } else {
-            document.getElementById("PostDeleter_SettingsPostDeleter").classList.remove("PostDeleter_Hidden")
-        }
-        document.getElementById("PostDeleter_BackgroundFullScreenPostDeleter").classList.remove("PostDeleter_Hidden")
+        ClassHelper(document.getElementById("PostDeleter_SettingsPostDeleter"), "toggle", "Popups")
+        ClassHelper(document.getElementById("PostDeleter_BackgroundFullScreenPostDeleter"), "remove", "Hidden")
     }
     Main_menu.append(Settings_PostDeleter)
     Append_Strip(Main_menu)
 
     let Remove_old_posts = document.createElement("div") //Пункт меню, удаляющий старые данные
-    Remove_old_posts.classList.add("PostDeleter_MainMenuItem")
+    ClassHelper(Remove_old_posts, "add", "Main_Menu_Item")
     Remove_old_posts.innerText = "Удаление старых данных"
     Remove_old_posts.onclick = function () { //Если портал не пытался загрузить пост более 10 раз, то данные, о том что пост был удален стираются
         if (confirm("Вы хотите удалить данные о постах, которые портал не пытался загрузить 10 раз?")) {
@@ -376,7 +388,7 @@ function Create_main_menu(firstcreate = true) {
     Append_Strip(Main_menu)
 
     let Clear_cache_div = document.createElement("div") //Очистка данных (если надо удалить аддон, то надо очистить данные в локальном хранилище)
-    Clear_cache_div.classList.add("PostDeleter_MainMenuItem")
+    ClassHelper(Clear_cache_div, "add", "Main_Menu_Item")
     Clear_cache_div.innerText = "Очистка данных"
     Clear_cache_div.id = "ClearCacheDiv"
     Clear_cache_div.onclick = function () { //Открытие меню с подтверждением действия
@@ -394,16 +406,12 @@ function Create_main_menu(firstcreate = true) {
     Main_menu.append(Clear_cache_div)
 
     let About_Div_Menu_item = document.createElement("div")   //Создание кнопки открытия справки
-    About_Div_Menu_item.classList.add("PostDeleter_MainMenuItem")
+    ClassHelper(About_Div_Menu_item, "add", "Main_Menu_Item")
     About_Div_Menu_item.innerText = "Справка"
     About_Div_Menu_item.id = "AboutPostDeleterMenuItem"
     About_Div_Menu_item.onclick = function () {
-        document.getElementById("PostDeleter_BackgroundFullScreenPostDeleter").classList.remove("PostDeleter_Hidden")
-        if (Settings.Animation_enabled) {
-            document.getElementById("PostDeleter_AboutPostDeleter").classList.add("PostDeleter_PopupsShow")
-        } else {
-            document.getElementById("PostDeleter_AboutPostDeleter").classList.remove("PostDeleter_Hidden")
-        }
+        ClassHelper(document.getElementById("PostDeleter_BackgroundFullScreenPostDeleter"), "remove", "Hidden")
+        ClassHelper(document.getElementById("PostDeleter_AboutPostDeleter"), "toggle", "Popups")
     }
     Append_Strip(Main_menu)
     Main_menu.append(About_Div_Menu_item)
@@ -415,7 +423,7 @@ function Create_main_menu(firstcreate = true) {
 
 function Append_Strip(elem) {    //Функция для добавления разделителя
     let Strip = document.createElement("hr")    //Создание тега hr для разделения элементов меню
-    Strip.classList.add("PostDeleter_Strips")
+    ClassHelper(Strip, "add", "Strips")
     elem.append(Strip)
 }
 
@@ -434,31 +442,21 @@ function Create_menu_with_deleted_posts() {
     let Menu_button_deleted_posts = document.createElement("button")    //Кнопка открывающая меню
     Menu_button_deleted_posts.innerText = "Удалённые посты"
     Menu_button_deleted_posts.id = "PostDeleter_DeletedPostsMenu"
-    Menu_button_deleted_posts.classList.add("PostDeleter_OpenMenuButtons")
-    if (Settings.Animation_enabled) {
-        Deleted_posts_menu.classList.add("PostDeleter_Menus")
-        Menu_button_deleted_posts.classList.add("PostDeleter_MenuButtons")
-    } else {
-        Menu_button_deleted_posts.classList.add("PostDeleter_MenuButtonsWithoutAnimation")
-        Deleted_posts_menu.classList.add("PostDeleter_Hidden")
-    }
+    ClassHelper(Menu_button_deleted_posts, "add", "Open_Menu_Buttons")
+    ClassHelper(Deleted_posts_menu, "add", "Menus")
+    ClassHelper(Menu_button_deleted_posts, "add", "Menu_Buttons")
     Menu_button_deleted_posts.onclick = function () { //Функция открывающая и закрывающая меню
-        if (Settings.Animation_enabled) {
-            Deleted_posts_menu.classList.toggle("PostDeleter_OpenMenu")
-            Menu_button_deleted_posts.classList.toggle("PostDeleter_WhenMenuOpen")
-        } else {
-            Deleted_posts_menu.classList.toggle("PostDeleter_Hidden")
-            Menu_button_deleted_posts.classList.toggle("PostDeleter_WhenMenuOpenWithoutAnimation")
-        }
+        ClassHelper(Deleted_posts_menu, "toggle", "Open_Menu")
+        ClassHelper(Menu_button_deleted_posts, "toggle", "Button_When_Menu_Open")
     }
     Menu_deleted_posts_div.append(Menu_button_deleted_posts)
 
     Deleted_posts_menu.id = "PostDeleter_DropMenuDeletedPosts"
-    Deleted_posts_menu.classList.add("PostDeleter_DropMenuDeletedPostsClass")
+    ClassHelper(Deleted_posts_menu, "add", "Menu_With_Deleted_Posts")
     Menu_deleted_posts_div.append(Deleted_posts_menu)
     let Deleted_posts_table_div = document.createElement("div")
     Deleted_posts_table_div.id = "PostDeleter_DeletedPostsTableDiv"
-    Deleted_posts_table_div.classList.add("PostDeleter_DeletedPostsTableDivClass")
+    ClassHelper(Deleted_posts_table_div, "add", "Div_For_Table_With_Deleted_Posts")
     Deleted_posts_menu.append(Deleted_posts_table_div)
     let Deleted_posts_table = document.createElement("table")
     Deleted_posts_table.id = "DeletedPostsTable"
@@ -470,21 +468,18 @@ function Create_menu_with_deleted_posts() {
         Deleted_posts_table.append(Deleted_posts_row)
         let Deleted_post_name = document.createElement("th")    // id поста
         Deleted_post_name.id = "PostDeleter_DeletedPostName" + i
-        Deleted_post_name.classList.add("PostDeleter_DeletedPostName")
+        ClassHelper(Deleted_post_name, "add", "Deleted_Post_Name")
         Deleted_post_name.innerText = Deleted_posts_array[i]
         let Deleted_post_button = document.createElement("th")  //Место для кнопки
         Deleted_post_button.id = "DeletedPostButton" + i
         Deleted_posts_row.append(Deleted_post_name)
         Deleted_posts_row.append(Deleted_post_button)
         Deleted_post_button = document.createElement("button")  //Сама кнопка
-        if (Settings.Button_enabled) {
-            Deleted_post_button.classList.add("PostDeleter_ReturnButtonPerfect")
-        }
+        ClassHelper(Deleted_post_button, "add", "Return_Buttons")
         Deleted_post_button.innerText = "Вернуть"
         Deleted_post_button.onclick = function () { //Функция нажатия на кнопку "Вернуть"
             try {
-                document.getElementById(Deleted_posts_array[i]).parentNode.classList.remove("PostDeleter_Hidden")  //Делаем пост снова видимым
-                document.getElementById(Deleted_posts_array[i]).parentNode.classList.remove("PostDeleter_DeletePost")
+                ClassHelper(document.getElementById(Deleted_posts_array[i]).parentNode, "remove", "Deleted_Post")
             } catch (error) {
             }
             Deleted_posts_array.splice(i, 1)    //Удаляем его из списка удаленных постов
@@ -564,41 +559,25 @@ function Authorized() { //Функция проверки, находимся л
     }
 }
 
-function Change_animation() {
-    if (Settings.Animation_enabled) {
-        document.getElementById("PostDeleter_AboutPostDeleter").classList.remove("PostDeleter_Hidden")
-        document.getElementById("PostDeleter_AboutPostDeleter").classList.add("PostDeleter_Popups")
-        document.getElementById("PostDeleter_SettingsPostDeleter").classList.remove("PostDeleter_Hidden")
-        document.getElementById("PostDeleter_SettingsPostDeleter").classList.add("PostDeleter_Popups")
-        document.getElementById("PostDeleter_SettingsPostDeleter").classList.add("PostDeleter_PopupsShow")
-        for (Post of Posts_array) {
-            if (Post.classList.contains("PostDeleter_Hidden")) {
-                Post.classList.add("PostDeleter_DeletePost")
-                Post.classList.remove("PostDeleter_Hidden")
-            }
-        }
-    } else {
-        document.getElementById("PostDeleter_AboutPostDeleter").classList.add("PostDeleter_Hidden")
-        document.getElementById("PostDeleter_AboutPostDeleter").classList.remove("PostDeleter_Popups")
-        document.getElementById("PostDeleter_SettingsPostDeleter").classList.remove("PostDeleter_Popups")
-        for (Post of Posts_array) {
-            if (Post.classList.contains("PostDeleter_DeletePost")) {
-                Post.classList.remove("PostDeleter_DeletePost")
-                Post.classList.add("PostDeleter_Hidden")
-            }
-        }
-    }
-}
-
-function ClassHelper(elem, action, ClassPath) {
+function ClassHelper(elem, action, ClassPath, forcetheme = undefined) {
     let ClassName = ""
-    let theme = Settings.theme
+    let theme = ""
+    let DefaultSettings = true
+    if (forcetheme == undefined) {
+        theme = Settings.theme
+    } else {
+        theme = forcetheme
+    }
     let SettingsTheme = null
-    if (Settings[theme + "Settings"] != undefined) {
-        SettingsTheme = JSON.parse(JSON.stringify(Settings[theme + "Settings"]))
+    if (DataBase.settings.theme[theme] == undefined) {
+        theme = "classic"
     }
     if (DataBase.settings.theme[theme][ClassPath] == undefined) {
         theme = "classic"
+        DefaultSettings = false
+    }
+    if (Settings[theme + "Settings"] != undefined) {
+        SettingsTheme = JSON.parse(JSON.stringify(Settings[theme + "Settings"]))
     }
     let db = DataBase.settings.theme[theme]
     switch (typeof (db[ClassPath])) {
@@ -606,7 +585,7 @@ function ClassHelper(elem, action, ClassPath) {
             ClassName = db[ClassPath]
             break
         case 'object':
-            if (Settings[db[ClassPath].change]) {
+            if (SettingsTheme[db[ClassPath].change] & DefaultSettings) {
                 ClassName = db[ClassPath].true
             } else {
                 ClassName = db[ClassPath].false

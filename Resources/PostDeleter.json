@@ -2,6 +2,7 @@
     "settings": {
         "theme": {
             "classic": {
+                "Title": "Классика",
                 "checkboxes": {
                     "Animation": "Анимации",
                     "Beautiful_Buttons": "Красивые кнопки"

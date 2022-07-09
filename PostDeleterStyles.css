@@ -176,7 +176,7 @@
         transition: opacity .2s .3s, max-height .5s;
     }
 
-    .PostDeleter_Menus.PostDeleter_OpenMenu {
+    .PostDeleter_OpenMenu {
         opacity: 1;
         max-height: 50vh;
         transition: opacity .5s .1s, max-height .5s .1s;

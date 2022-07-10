@@ -1,7 +1,7 @@
-    .PostDeleter_Hidden{
+    .PostDeleter_Hidden {
         display: none;
     }
-    
+
     /* Контейнер для меню */
     .PostDeleter_DivForMenusClass {
         display: flex;
@@ -9,13 +9,13 @@
         padding: 10px 0;
     }
 
-    .workarea-content-paddings{
+    .workarea-content-paddings {
         min-height: 100vh;
     }
 
     .PostDeleter_ReturnButtonPerfect {
         border-color: #3498db;
-        color:black;
+        color: black;
         box-shadow: 0 0 10px 1px #3498db inset, 0 0 0 0 #3498db;
         transition: all 150ms ease-in-out;
         border-radius: 10px;
@@ -246,7 +246,7 @@
     }
 
     .PostDeleter_ClosePopupImage,
-    .PostDeleter_ClosePopup  {
+    .PostDeleter_ClosePopup {
         max-height: 4vh;
         max-width: 4vh;
     }
@@ -310,7 +310,7 @@
         overflow-y: auto;
     }
 
-    .PostDeleter_Title{
+    .PostDeleter_Title {
         font-size: min(4vh, 50px);
     }
 

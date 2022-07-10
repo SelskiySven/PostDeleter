@@ -9,7 +9,6 @@ let Nums_of_non_loaded_post = []  //Массив с количеcтвом неу
 let Nums_of_non_loaded_post_original = [] //Массив с количсетвом неудачных попыток скрыть пост из локального хранилища
 let Posts_array = document.getElementsByClassName("feed-item-wrap")     //Cписок всех постов
 let Settings = {}
-let LastTheme = undefined
 
 let PostDeleter_Add_More_Posts_Button = document.createElement("div") //Способ загрузки новых сообщений в обход блокировки manifest v3
 PostDeleter_Add_More_Posts_Button.hidden = true
@@ -105,12 +104,17 @@ function Get_data() {
 Get_data()
 
 //Удаление постов
-function Delete_posts() {
+function Delete_posts(PrevClass = undefined, LastTheme = undefined) {
     if (Authorized()) {
         for (let i = 0; i < Deleted_posts_array.length; i++) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
                 document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
-                ClassHelper(document.getElementById(Deleted_posts_array[i]).parentNode, "remove", "Deleted_Post", LastTheme)
+                if (PrevClass != undefined) {
+                    document.getElementById(Deleted_posts_array[i]).parentNode.classList.remove(PrevClass)
+                }
+                if (LastTheme != undefined) {
+                    ClassHelper(document.getElementById(Deleted_posts_array[i]).parentNode, "remove", "Deleted_Post", LastTheme)
+                }
                 ClassHelper(document.getElementById(Deleted_posts_array[i]).parentNode, "add", "Deleted_Post")
                 setTimeout(() => {
                     document.getElementById(Deleted_posts_array[i]).parentNode.hidden = false
@@ -173,7 +177,7 @@ function Create_div_for_menus() {
 
 
 //Функция для создания главного меню
-function Create_main_menu() {
+function Create_main_menu(recreate = false) {
     try {   //Пытаемся удалить кнопку открывающую меню и само меню, т.к. иногда нужно пересоздавать меню
         document.getElementById("MainMenuDiv").remove()
         document.getElementById("PostDeleter_BackgroundFullScreenPostDeleter").remove()
@@ -202,7 +206,8 @@ function Create_main_menu() {
     let About_Postdeleter_header = document.createElement("div")
     About_Postdeleter_header.id = "PostDeleter_AboutHeader"
     ClassHelper(About_Postdeleter_header, "add", "Popup_Header")
-    About_Postdeleter_header.innerHTML = "<h1 class='PostDeleter_Title'>PostDeleter v" + Manifest.version + "</h1>"
+    About_Postdeleter_header.innerHTML = "<h1>PostDeleter v" + Manifest.version + "</h1>"
+    ClassHelper(About_Postdeleter_header.firstChild, "add", "Popup_Title")
     About_PostDeleter.append(About_Postdeleter_header, About_Posdeleter_body)
     let Close_about_button = document.createElement("button")
     ClassHelper(Close_about_button, "add", "Close_Popup")
@@ -296,30 +301,30 @@ function Create_main_menu() {
     Save_settings.onclick = function () {
         Settings.Minimum_number_of_posts = parseInt(document.getElementById("PostDeleter_MinimumNumberOfPosts").value)
         Check_number_of_visible_posts()
-        LastTheme = Settings.theme + ""
+        let lasttheme = Settings.theme + ""
+        let prevclass = ClassHelper(0, "return", "Deleted_Post")
         Settings.theme = document.getElementById("PostDeleter_SelectTheme").value
-        if (Settings[Settings.theme + "Settings"]==undefined){
-            Settings[Settings.theme + "Settings"]={}
+        if (Settings[Settings.theme + "Settings"] == undefined) {
+            Settings[Settings.theme + "Settings"] = {}
         }
         for (key in DataBase.settings.theme[Settings.theme].checkboxes) {
             Settings[Settings.theme + "Settings"][key] = document.getElementById("PostDeleter_" + Settings.theme + key).checked
         }
         localStorage.setItem("PostDeleterSettings", JSON.stringify(Settings))
-        if (LastTheme != Settings.theme) {
-            Create_main_menu()
-        }
+        Create_main_menu(true)
         Create_deleter()
-        Delete_posts()
+        Delete_posts(prevclass, lasttheme)
         Create_menu_with_deleted_posts()
-        Settings_message.innerText = ""
-        setTimeout(() => {
-            Settings_message.innerText = "Успешно сохранено"
-        }, 100);
     }
     Settings_footer.append(Save_settings)
     Settings_footer.append(Settings_message)
     Settings_PostDeleter_window.append(Settings_footer)
     document.body.append(Settings_PostDeleter_window)
+    if (recreate) {
+        ClassHelper(Settings_PostDeleter_window, "toggle", "Popups")
+        ClassHelper(Background_Fullscreen_PostDeleter, "remove", "Hidden")
+        Settings_message.innerText = "Успешно сохранено"
+    }
 
 
     let Main_menu_div = document.createElement("div")   //Создание контейнера для кнопки, открывающей меню, и самого меню
@@ -512,10 +517,7 @@ function Check_number_of_visible_posts(ondelete = false) {
 //Функция для загрузки новых постов
 function Add_more_posts() {
     if (document.getElementById("LIVEFEED_search").value == "") { //Если в поиске ничего не набрано
-        // location.href = 'javascript:BX.Livefeed.PageInstance.getNextPage()'; //Вызов функции Bitrix для добавления новых сообщений 
-        // BX.Livefeed.PageInstance.getNextPage()
-        // eval("location.href = 'javascript:BX.Livefeed.PageInstance.getNextPage()'")
-        PostDeleter_Add_More_Posts_Button.firstChild.click()
+        PostDeleter_Add_More_Posts_Button.firstChild.click()    //Вызов функции Bitrix для добавления новых сообщений 
     }
 }
 
@@ -602,5 +604,7 @@ function ClassHelper(elem, action, ClassPath, forcetheme = undefined) {
         case "toggle":
             elem.classList.toggle(ClassName)
             break
+        case "return":
+            return ClassName
     }
 }

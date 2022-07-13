@@ -72,6 +72,33 @@
                 "CheckboxClass": "PostDeleter_SettingsSwitchCheckbox",
                 "Settings_Item_Description": "PostDeleter_SettingsItemDescription",
                 "Settings_Item": "PostDeleter_SettingsItem"
+            },
+            "test": {
+                "Title": "ТЕСТ",
+                "select": {
+                    "color": {
+                        "Title": "Цвет кнопок удаления",
+                        "options": {
+                            "black": "Чёрный",
+                            "green": "Зелёный",
+                            "yellow": "Жёлтый"
+                        }
+                    }
+                },
+                "checkboxes":{
+                    "hz":"Цвет настроек и справки зеленый/фиолетовый"
+                },
+                "Deleter_Image": {
+                    "change": "color",
+                    "black": "PostDeleter_DeleterImage_Black",
+                    "green": "PostDeleter_DeleterImage_Green",
+                    "yellow": "PostDeleter_DeleterImage_Yellow"
+                },
+                "Popup_Basic":{
+                    "change":"hz",
+                    "true":"PostDeleter_PopupsPurple",
+                    "false":"PostDeleter_PopupsGreen"
+                }
             }
         },
         "language": {

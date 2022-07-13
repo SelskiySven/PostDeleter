@@ -52,21 +52,23 @@ if (localStorage.getItem("Minimum_Number_Of_Posts") != null) {
     localStorage.removeItem("Minimum_Number_Of_Posts")
     localStorage.setItem("PostDeleterSettings", '{"Minimum_number_of_posts":' + Settings.Minimum_number_of_posts + '}')
 }
-if (JSON.parse(localStorage.getItem("PostDeleterSettings")).Animation_enabled != undefined | JSON.parse(localStorage.getItem("PostDeleterSettings")).Button_enabled != undefined) {
-    let oldSettings = JSON.parse(localStorage.getItem("PostDeleterSettings"))
-    let NewSettings = {}
-    NewSettings.theme = "classic"
-    NewSettings.classicSettings = {}
-    if (oldSettings.Animation_enabled != undefined) {
-        NewSettings.classicSettings.Animation = oldSettings.Animation_enabled
+if (localStorage.getItem("PostDeleterSettings") != null) {
+    if (JSON.parse(localStorage.getItem("PostDeleterSettings")).Animation_enabled != undefined | JSON.parse(localStorage.getItem("PostDeleterSettings")).Button_enabled != undefined) {
+        let oldSettings = JSON.parse(localStorage.getItem("PostDeleterSettings"))
+        let NewSettings = {}
+        NewSettings.theme = "classic"
+        NewSettings.classicSettings = {}
+        if (oldSettings.Animation_enabled != undefined) {
+            NewSettings.classicSettings.Animation = oldSettings.Animation_enabled
+        }
+        if (oldSettings.Buttons_enabled != undefined) {
+            NewSettings.classicSettings.Beautiful_Buttons = oldSettings.Animation_enabled
+        }
+        if (oldSettings.Minimum_number_of_posts != undefined) {
+            NewSettings.Minimum_number_of_posts = oldSettings.Minimum_number_of_posts
+        }
+        localStorage.setItem("PostDeleterSettings", JSON.stringify(NewSettings))
     }
-    if (oldSettings.Buttons_enabled != undefined) {
-        NewSettings.classicSettings.Beautiful_Buttons = oldSettings.Animation_enabled
-    }
-    if (oldSettings.Minimum_number_of_posts != undefined) {
-        NewSettings.Minimum_number_of_posts = oldSettings.Minimum_number_of_posts
-    }
-    localStorage.setItem("PostDeleterSettings", JSON.stringify(NewSettings))
 }
 
 //Загрузка данных из локального хранилища
@@ -94,6 +96,19 @@ function Get_data() {
         getDB.open("GET", DataBase_path, true)
         getDB.onload = function () {
             DataBase = getDB.response
+            for (theme in DataBase.settings.theme) {
+                if (Settings[theme + "Settings"] == undefined) {
+                    Settings[theme + "Settings"] = {}
+                }
+            }
+            for (theme in DataBase.theme) {
+                if (DataBase.theme[theme].checkboxes == undefined) {
+                    DataBase.theme[theme].checkboxes = {}
+                }
+                if (DataBase.theme[theme].select == undefined) {
+                    DataBase.theme[theme].select = {}
+                }
+            }
             Create_deleter()
             Create_div_for_menus()
             Delete_posts()
@@ -104,16 +119,13 @@ function Get_data() {
 Get_data()
 
 //Удаление постов
-function Delete_posts(PrevClass = undefined, LastTheme = undefined) {
+function Delete_posts(PrevClass = undefined) {
     if (Authorized()) {
         for (let i = 0; i < Deleted_posts_array.length; i++) {
             try {   // Пытаемся удалить данный пост(может быть ситуация что пост старый и он еще не загружен на страницу)
                 document.getElementById(Deleted_posts_array[i]).parentNode.hidden = true
                 if (PrevClass != undefined) {
                     document.getElementById(Deleted_posts_array[i]).parentNode.classList.remove(PrevClass)
-                }
-                if (LastTheme != undefined) {
-                    ClassHelper(document.getElementById(Deleted_posts_array[i]).parentNode, "remove", "Deleted_Post", LastTheme)
                 }
                 ClassHelper(document.getElementById(Deleted_posts_array[i]).parentNode, "add", "Deleted_Post")
                 setTimeout(() => {
@@ -287,6 +299,26 @@ function Create_main_menu(recreate = false) {
                 document.getElementById("PostDeleter_ThemeSettings").append(CheckBox_title, Settings_checkbox_item)
                 Append_Strip(document.getElementById("PostDeleter_ThemeSettings"))
             }
+            for (key in DataBase.settings.theme[Select_theme.value].select) {
+                let Select_title = document.createElement("div")
+                Select_title.innerText = DataBase.settings.theme[Select_theme.value].select[key].Title
+                ClassHelper(Select_title, "add", "Settings_Item_Description")
+                let NewSelect = document.createElement("select")
+                NewSelect.id = "PostDeleter_" + Select_theme.value + key
+                for (option in DataBase.settings.theme[Select_theme.value].select[key].options) {
+                    let newOption = new Option(DataBase.settings.theme[Select_theme.value].select[key].options[option], option)
+                    if (Settings[Select_theme.value + "Settings"][key] != undefined) {
+                        if (option == Settings[Select_theme.value + "Settings"][key]) {
+                            newOption.selected = true
+                        }
+                    }
+                    NewSelect.options[NewSelect.options.length] = newOption
+                }
+                let Settings_select_item = document.createElement("div")
+                ClassHelper(Settings_select_item, "add", "Settings_Item")
+                Settings_select_item.append(NewSelect)
+                document.getElementById("PostDeleter_ThemeSettings").append(Select_title, Settings_select_item)
+            }
         }
         Create_Theme_Settings()
     }
@@ -301,7 +333,6 @@ function Create_main_menu(recreate = false) {
     Save_settings.onclick = function () {
         Settings.Minimum_number_of_posts = parseInt(document.getElementById("PostDeleter_MinimumNumberOfPosts").value)
         Check_number_of_visible_posts()
-        let lasttheme = Settings.theme + ""
         let prevclass = ClassHelper(0, "return", "Deleted_Post")
         Settings.theme = document.getElementById("PostDeleter_SelectTheme").value
         if (Settings[Settings.theme + "Settings"] == undefined) {
@@ -310,10 +341,13 @@ function Create_main_menu(recreate = false) {
         for (key in DataBase.settings.theme[Settings.theme].checkboxes) {
             Settings[Settings.theme + "Settings"][key] = document.getElementById("PostDeleter_" + Settings.theme + key).checked
         }
+        for (key in DataBase.settings.theme[Settings.theme].select) {
+            Settings[Settings.theme + "Settings"][key] = document.getElementById("PostDeleter_" + Settings.theme + key).value
+        }
         localStorage.setItem("PostDeleterSettings", JSON.stringify(Settings))
         Create_main_menu(true)
         Create_deleter()
-        Delete_posts(prevclass, lasttheme)
+        Delete_posts(prevclass)
         Create_menu_with_deleted_posts()
     }
     Settings_footer.append(Save_settings)
@@ -570,7 +604,7 @@ function ClassHelper(elem, action, ClassPath, forcetheme = undefined) {
     } else {
         theme = forcetheme
     }
-    let SettingsTheme = null
+    let SettingsTheme = {}
     if (DataBase.settings.theme[theme] == undefined) {
         theme = "classic"
     }
@@ -587,10 +621,22 @@ function ClassHelper(elem, action, ClassPath, forcetheme = undefined) {
             ClassName = db[ClassPath]
             break
         case 'object':
-            if (SettingsTheme[db[ClassPath].change] & DefaultSettings) {
-                ClassName = db[ClassPath].true
+            if (db.checkboxes[db[ClassPath].change] != undefined) {
+                if (SettingsTheme[db[ClassPath].change] & DefaultSettings) {
+                    ClassName = db[ClassPath].true
+                } else {
+                    ClassName = db[ClassPath].false
+                }
             } else {
-                ClassName = db[ClassPath].false
+                if (SettingsTheme[db[ClassPath].change] == undefined | !DefaultSettings) {
+                    if (Object.keys(db[ClassPath][0] == "change")) {
+                        ClassName = Object.values(db[ClassPath])[1]
+                    } else {
+                        ClassName = Object.values(db[ClassPath])[0]
+                    }
+                } else {
+                    ClassName = db[ClassPath][SettingsTheme[db[ClassPath].change]]
+                }
             }
             break
     }
